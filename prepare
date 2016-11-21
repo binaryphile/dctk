@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+[[ -n $_dctk_prepare ]] && return
+readonly _dctk_prepare=loaded
+
+source kzn.bash
+initialize_kzn
+
+prog=dctk
+
+printf -v expression "s/%s/%s/g" "$prog" "%s"
+
+define message <<'EOS'
+Done! Enjoy your new %s! If you're happy with your %s, run:
+
+    rm -rf .git
+    git init
+    git add .
+    git commit -m 'Starting off %s'
+    ./bin/%s init
+
+Made a mistake? Want to make a different %s? Run:
+
+    git add .
+    git checkout -f
+
+Thanks for making a %s!\n
+EOS
+# shellcheck disable=SC2059
+printf -v message "$message" "$prog" "$prog" "%s" "%s" "$prog" "$prog"
+
+main() {
+  local name=${1:-}
+  local bin
+  local libexec
+  local file
+  local root
+  local sed_expr
+  local share
+
+  is_given "$name" || errexit "usage: prepare name_of_your_$prog"
+
+  root=$(realpath "$BASH_SOURCE")
+  root=$(dirname "$root")
+  bin=$root/bin
+  libexec=$root/libexec
+  share=$root/share
+
+  name=$(to_lower "$name")
+
+  printf "Preparing your '%s' %s!\n" "$name" "$prog"
+
+  # shellcheck disable=SC2154
+  $rm "$root"/README.md
+  $rm "$root"/prepare
+
+  # shellcheck disable=SC2059,SC2154
+  is_same_as "$prog" "$name" && { printf "$message" "$name" "$name"; exit ;}
+
+  mv "$share/$prog" "$share/$name"
+
+  for file in **/"$prog"*; do
+    # shellcheck disable=SC2059
+    printf -v sed_expr "$expression" "$name"
+    sed "$sed_expr" "$file" > "${file/$prog/$name}"
+    $rm "$file"
+  done
+
+  for file in "$libexec"/*; do
+    chmod a+x "$file"
+  done
+
+  $rm "$bin/$prog"
+  ln -sf ../libexec/"$name" "$bin/$name"
+
+  # shellcheck disable=SC2059
+  printf "$message" "$name" "$name"
+}
+
+return 0 2>/dev/null ||:
+
+strict_mode on
+main "$@"

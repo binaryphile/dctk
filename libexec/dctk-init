@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+[[ -n $_dctk_init ]] && return
+readonly _dctk_init=loaded
+
+source kzn.bash
+initialize_kzn
+
+define error_message <<'EOS'
+# Load dctk automatically by adding
+# the following to %s:
+
+eval "$(%s/bin/dctk init -)"
+EOS
+
+main() {
+  local -a commands
+  local libexec
+  local path_format
+  local print
+  local profile
+  local root
+  local shell
+  local shell_format
+  local wrapper_format
+
+  libexec=$(realpath "$BASH_SOURCE")
+  libexec=$(dirname "$libexec")
+  root=$(absolute_path "$libexec"/..)
+
+  print=""
+  is_same_as - "${1:-}" && {
+    print=1
+    shift
+  }
+
+  shell=${1:-}
+  is_given "$shell" || shell=$(basename "$SHELL")
+
+  ! is_given "$print" && {
+    case $shell in
+      "bash" )
+        # shellcheck disable=SC2088
+        profile='~/.bash_profile'
+        ;;
+      "zsh" )
+        # shellcheck disable=SC2088
+        profile='~/.zshenv'
+        ;;
+      * )
+        profile='your profile'
+        ;;
+      esac
+
+    # shellcheck disable=SC2059,SC2154
+    errexit "$(printf "$error_message\n" "$profile" "$root")"
+  }
+
+  # shellcheck disable=SC2016
+  path_format='export PATH=$PATH:%q/bin'
+  # shellcheck disable=SC2059,SC2154
+  printf "$path_format\n" "$root"
+
+  case $shell in
+    "bash" | "zsh" )
+      shell_format='source %q/completions/dctk.%q'
+      # shellcheck disable=SC2059,SC2154
+      printf "$shell_format\n" "$root" "$shell"
+      ;;
+  esac
+
+  commands=( $(dctk commands --sh) )
+
+  define wrapper_format <<'EOS'
+_dctk_wrapper() {
+  local command=$1
+
+  (( $# > 0 )) && shift
+
+  case $command in
+    "%s" )
+      eval $(dctk sh-"$command" "$@")
+      ;;
+    * )
+      command dctk "$command" "$@"
+      ;;
+  esac
+}
+EOS
+
+  IFS="|"
+  # shellcheck disable=SC2059,SC2154
+  printf "$wrapper_format\n" "${commands[*]}"
+
+  # zsh can't pass argument with aliases, but bash can.
+  # zsh can have functions with the name being only numbers, but bash can't.
+  # fix both cases here by letting zsh have a function, and bash have its alias.
+  case $shell in
+    "bash" )
+      puts "alias dctk=_dctk_wrapper"
+      ;;
+    "zsh" )
+      puts "dctk=_dctk_wrapper"
+      ;;
+  esac
+}
+
+return 0 2>/dev/null ||:
+
+strict_mode on
+main "$@"
