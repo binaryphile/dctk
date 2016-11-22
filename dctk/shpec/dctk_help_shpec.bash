@@ -3,12 +3,12 @@ initialize_shpec_helper
 
 libexec=$(realpath "$BASH_SOURCE")
 libexec=$(dirname "$libexec")
-libexec=$(absolute_path "$libexec"/../libexec)
+libexec=$(absolute_path "$libexec"/../dctk/libexec)
 
 PATH=$libexec:$PATH
 
 
-describe "dctk-help"
+describe "help"
   it "outputs a message with no input"; ( _shpec_failures=0   # shellcheck disable=SC2030
 
     define expected <<'EOS'
@@ -20,7 +20,7 @@ Some useful dctk commands are:
 See 'dctk help <command>' for information on a specific command.
 EOS
 
-    result=$("$libexec"/dctk-help)
+    result=$("$libexec"/help)
     # shellcheck disable=SC2154
     assert equal "$expected" "$result"
 
@@ -36,7 +36,7 @@ This command is mostly used for autocompletion in various shells, and for `dctk 
 Also, this command helps find commands that are named the same as potentially builtin shell commands (which, cd, etc)
 EOS
 
-    result=$("$libexec"/dctk-help commands)
+    result=$("$libexec"/help commands)
     # shellcheck disable=SC2154
     assert equal "$expected" "$result"
 
@@ -45,7 +45,7 @@ EOS
 
   it "outputs a message for completions"; ( _shpec_failures=0   # shellcheck disable=SC2030
 
-    result=$("$libexec"/dctk-help completions)
+    result=$("$libexec"/help completions)
     assert equal "Sorry, this command isn't documented yet." "$result"
 
     return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
@@ -53,7 +53,7 @@ EOS
 
   it "outputs a message for help"; ( _shpec_failures=0   # shellcheck disable=SC2030
 
-    result=$("$libexec"/dctk-help help)
+    result=$("$libexec"/help help)
     assert equal "Sorry, this command isn't documented yet." "$result"
 
     return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
@@ -61,23 +61,7 @@ EOS
 
   it "outputs a message for init"; ( _shpec_failures=0   # shellcheck disable=SC2030
 
-    result=$("$libexec"/dctk-help init)
-    assert equal "Sorry, this command isn't documented yet." "$result"
-
-    return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
-  end
-
-  it "outputs a message for sh-shell"; ( _shpec_failures=0   # shellcheck disable=SC2030
-
-    result=$("$libexec"/dctk-help sh-shell)
-    assert equal "Sorry, this command isn't documented yet." "$result"
-
-    return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
-  end
-
-  it "outputs a message for shell"; ( _shpec_failures=0   # shellcheck disable=SC2030
-
-    result=$("$libexec"/dctk-help shell)
+    result=$("$libexec"/help init)
     assert equal "Sorry, this command isn't documented yet." "$result"
 
     return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:

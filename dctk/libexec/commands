@@ -10,45 +10,26 @@ readonly _dctk_commands=loaded
 source kzn.bash
 initialize_kzn
 
-define completions <<'EOS'
---sh
---no-sh
-EOS
-
 main() {
   local libexec
-  local sh
 
   libexec=$(realpath "$BASH_SOURCE")
   libexec=$(dirname "$libexec")
 
-  # provide dctk completions
+  # provide completions
   # shellcheck disable=SC2154
   is_same_as --complete "${1:-}" && { puts "$completions"; exit ;}
 
-  case ${1:-} in
-    "--sh" )
-      sh=yes
-      ;;
-    "--no-sh" )
-      sh=no
-      ;;
-  esac
-
-  list_commands "$libexec" "${sh:-}" | uniq | sort
+  list_commands "$libexec" | uniq | sort
 }
 
 list_commands() {
   local libexec=$1
-  local sh=$2
   local command
 
   shopt -s nullglob
-  for command in "$libexec"/dctk-*; do
-    command=${command##*dctk-}
-    { is_same_as yes "${sh:-}" &&  ! starts_with sh- "$command" ;} && continue
-    { is_same_as no  "${sh:-}" &&    starts_with sh- "$command" ;} && continue
-    puts "${command##sh-}"
+  for command in "$libexec"/*; do
+    puts "$(basename "$command")"
   done
 }
 

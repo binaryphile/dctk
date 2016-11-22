@@ -9,10 +9,14 @@ initialize_kzn
 main() {
   local command=${1:-}
   local command_path
+  local libexec
 
   is_given "$command" || errexit "usage: dctk completions COMMAND [arg1 arg2...]"
 
-  command_path=$(command -v dctk-"$command")
+  libexec=$(realpath "$BASH_SOURCE")
+  libexec=$(dirname "$libexec")
+  command_path=$libexec/$command
+
   grep -qi "# provide completions" "$command_path" || return 0
   shift
   exec "$command_path" --complete "$@"

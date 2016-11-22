@@ -98,7 +98,7 @@ EOS
     ! is_symlink "$dir"/bin/dctk
     assert equal 0 "$?"
 
-    assert equal ../libexec/name "$(readlink "$dir"/bin/name)"
+    assert equal ../dctk/name "$(readlink "$dir"/bin/name)"
 
     # shellcheck disable=SC2154
     $rm "$dir"
@@ -106,7 +106,7 @@ EOS
     return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
   end
 
-  it "renames share/dctk"; ( _shpec_failures=0   # shellcheck disable=SC2030
+  it "creates a name directory"; ( _shpec_failures=0   # shellcheck disable=SC2030
 
     # shellcheck disable=SC2154
     dir=$($mktempd) || return 1
@@ -115,35 +115,8 @@ EOS
 
     result=$("$dir"/prepare name)
 
-    ! is_directory "$dir"/share/dctk
-    assert equal 0 "$?"
-
-    is_directory "$dir"/share/name
-    assert equal 0 "$?"
-
-    # shellcheck disable=SC2154
-    $rm "$dir"
-
-    return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
-  end
-
-  it "renames all files from dctk to name"; ( _shpec_failures=0   # shellcheck disable=SC2030
-
-    # shellcheck disable=SC2154
-    dir=$($mktempd) || return 1
-    cp -r "$root"/* "$dir"
-    cd "$dir"
-
-    files=( $(find . -name shpec -prune -o -type f -name "dctk*" -print) )
-    result=$("$dir"/prepare name)
-
-    for file in "${files[@]}"; do
-      ! is_file "$file"
-      assert equal 0 "$?"
-
-      is_file "${file/dctk/name}"
-      assert equal 0 "$?"
-    done
+    is_directory "$dir/name"
+    assert equal 0 $?
 
     # shellcheck disable=SC2154
     $rm "$dir"

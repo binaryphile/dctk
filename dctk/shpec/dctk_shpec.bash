@@ -1,11 +1,9 @@
 source shpec_helper.bash
 initialize_shpec_helper
 
-libexec=$(realpath "$BASH_SOURCE")
-libexec=$(dirname "$libexec")
-libexec=$(absolute_path "$libexec"/../libexec)
-
-PATH=$libexec:$PATH
+dctk=$(realpath "$BASH_SOURCE")
+dctk=$(dirname "$dctk")
+dctk=$(absolute_path "$dctk"/../dctk/dctk)
 
 
 describe "dctk"
@@ -20,7 +18,7 @@ Some useful dctk commands are:
 See 'dctk help <command>' for information on a specific command.
 EOS
 
-    result=$("$libexec"/dctk)
+    result=$("$dctk")
     #shellcheck disable=SC2154
     assert equal "$expected" "$result"
 
@@ -38,7 +36,7 @@ Some useful dctk commands are:
 See 'dctk help <command>' for information on a specific command.
 EOS
 
-    result=$("$libexec"/dctk help)
+    result=$("$dctk" help)
     assert equal "$expected" "$result"
 
     return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:

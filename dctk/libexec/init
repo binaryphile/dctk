@@ -26,13 +26,10 @@ main() {
 
   libexec=$(realpath "$BASH_SOURCE")
   libexec=$(dirname "$libexec")
-  root=$(absolute_path "$libexec"/..)
+  root=$(absolute_path "$libexec"/../..)
 
   print=""
-  is_same_as - "${1:-}" && {
-    print=1
-    shift
-  }
+  is_same_as - "${1:-}" && { print=1; shift ;}
 
   shell=${1:-}
   is_given "$shell" || shell=$(basename "$SHELL")
@@ -66,41 +63,6 @@ main() {
       shell_format='source %q/completions/dctk.%q'
       # shellcheck disable=SC2059,SC2154
       printf "$shell_format\n" "$root" "$shell"
-      ;;
-  esac
-
-  commands=( $(dctk commands --sh) )
-
-  define wrapper_format <<'EOS'
-_dctk_wrapper() {
-  local command=$1
-
-  (( $# > 0 )) && shift
-
-  case $command in
-    "%s" )
-      eval $(dctk sh-"$command" "$@")
-      ;;
-    * )
-      command dctk "$command" "$@"
-      ;;
-  esac
-}
-EOS
-
-  IFS="|"
-  # shellcheck disable=SC2059,SC2154
-  printf "$wrapper_format\n" "${commands[*]}"
-
-  # zsh can't pass argument with aliases, but bash can.
-  # zsh can have functions with the name being only numbers, but bash can't.
-  # fix both cases here by letting zsh have a function, and bash have its alias.
-  case $shell in
-    "bash" )
-      puts "alias dctk=_dctk_wrapper"
-      ;;
-    "zsh" )
-      puts "dctk=_dctk_wrapper"
       ;;
   esac
 }

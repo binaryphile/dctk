@@ -18,23 +18,30 @@ implemented as a trapper-keeper:
     $ rbenv shell 1.9.3-p194   # runs the "shell" subcommand, passing "1.9.3-p194" as an argument
 
 Each subcommand maps to a separate, standalone executable file. dctk
-provides the following basic structure for you:
+operates with the following basic tree structure (all are directories):
 
     .
-    ├── bin               # your trapper-keeper's command-line executable(s)
-    ├── completions       # optional bash/zsh completions
-    ├── libexec           # subcommands executables
-    └── share             # related platform-independent files
+    ├── bin               # link(s) to main dctk executable, but named after their [command](s)
+    ├─┬ dctk              # built-in functionality
+    │ ├── libexec         # core dctk command and subcommands
+    │ └── completions     # bash/zsh automatic completion code
+    ├── [command]         # your command's subcommands
+    ├── [another command] # you can have more than one
+    └─┬ [legacy command]  # when you already have or need more structure
+      ├── bin             # if bin and/or libexec exist, look there instead for subcommands
+      ├── libexec         # for example, when importing an existing project or [sub]
+      ├── share           # or to separate out supporting files
+      └── other           # whatever you like
 
 # creating your first command
 
 Here's an example of adding a new subcommand. Let's say your
-trapper-keeper is named `rush`. Run:
+trapper-keeper is named "rush". Run:
 
-    touch libexec/rush-who
-    chmod +x libexec/rush-who
+    touch rush/who
+    chmod +x rush/who
 
-Edit `rush-who` with the following:
+Edit `rush/who` with the following:
 
 ``` bash
 #!/usr/bin/env bash
@@ -50,15 +57,16 @@ Now you can run `rush who`:
 That's it.  You now have a working subcommand.
 
 You can add autocompletion support and help documentation as well, by
-adding a little bit more to your script as you'll see.
+adding a little bit more to your script, as you'll see.
 
 # dctk the project versus the command
 
 dctk, the project, is this repo and the code of which it is comprised.
-While it is invoked using the command `dctk`, which lives in `libexec`,
-that file will ultimately be renamed to your command's name.  I'll still
-refer to the project and how it works as dctk, even though the `dctk`
-file will no longer bear that name when you customize it.
+
+While it is invoked using the command `dctk` at the moment, which is a
+link in `bin`, the link will ultimately be renamed to your command's
+name.  This readme refers to the project and how it works as dctk, even
+though there won't be a `dctk` command after you `prepare` it.
 
 Your project will contain dctk's bones but will add the functionality
 that makes it your own command.
@@ -74,43 +82,46 @@ Then run the `prepare` script while in this directory:
     $ cd [command]
     $ ./prepare [command]
 
-Third, add the following to your shell's startup script:
+Third, add the following to your shell's startup script (.bash_profile
+or .zshrc, for example):
 
     eval "$("$HOME"/[path to command]/bin/[command] init -)"
 
-Finally, you may decide to get rid of the `.git` folder and perhaps
-start your own repository.
+Finally, you may decide to get rid of the `.git` folder and start your
+own repository.
 
-Once renamed, dctk becomes the new command is invoked like so:
+Once `prepare`d, dctk becomes the new command is invoked like so:
 
     $ [command] [subcommand] [(args)]
 
 # the dctk command
 
-dctk itself is renamed to your command.  The renamed script lives in
-`libexec`.  You can examine that file to see the guts of dctk in action.
+Your command in `bin` is actually a link to the dctk script in
+`dctk/dctk`.  You can examine the file their to see the guts of dctk in
+action.
 
-The dctk script might more correctly belong in `bin`, but for the
-convenience of the renaming process it is in `libexec` with all of the
-other basic scripts.  It is linked from `bin` however, and the minimum
-for dctk to work (without autocompletion) is for `bin` to be on your
-PATH (although you should use the eval statement in the installation
-section instead for full support).
+dctk determines your command name from how it was invoked on the
+command-line, so the fact that its filename doesn't match the command is
+not important.
 
-## what's in your trapper-keeper
+When this document refers to the `dctk` command, it means your command
+instead once you've `prepare`d the project.  Once `prepare`d, there is no
+`dctk` command.
+
+# what's in your trapper-keeper
 
 Your trapper-keeper comes with a few basics built-in:
 
-  - `[command] commands` - Print available subcommands
+  - `dctk commands` - Print available subcommands
 
-  - `[command] completions` - Provide command completion details for use by shell
+  - `dctk completions` - Provide command completion details for use by shell
     autocompletion
 
-  - `[command] help` - Parse and display subcommand help, if provided in the
+  - `dctk help` - Parse and display subcommand help, if provided in the
     script
 
-  - `[command] init` - Hook completions into the shell, usually when invoked from
-    a shell startup file (e.g. `.bashrc`)
+  - `dctk init` - Hook completions into the shell, usually when invoked from
+    a shell startup file (e.g. `.bash_profile`)
 
 If you ever need to reference files inside of your trapper-keeper
 installation, say to access a file in the `share` directory, your
@@ -120,8 +131,10 @@ named "rush", then the variable is `_RUSH_ROOT`.
 
 # subcommands
 
-Subcommands live in `libexec` and have names of the form
-`[command]-[subcommand]`, where `[command]` is your new command name.
+Subcommands live in the directory named for your command and are simply
+named for the subcommand, e.g. `rbenv/versions`.  For this reason you
+can't make a command with the same name as the existing directories,
+`bin` or `dctk`.  Anything else is fair game.
 
 Subcommands don't have to be written in bash.  They can be any
 executable, scripted or compiled.  Even symlinks work.
@@ -215,7 +228,7 @@ Passing the `--complete` flag to this subcommand short circuits its
 normal operation and instead returns the valid completions to the shell.
 dctk feeds this to your shell's autocompletion handler for you.
 
-## why a trapper-keeper?
+# why a trapper-keeper?
 
 dctk is meant to make it easy to assimilate any kind of technology into
 your trapper-keeper as a subcommand, much like *Dawson's Creek Trapper
@@ -224,16 +237,16 @@ belongings (as well as Cartman himself).  The trapper-keeper ultimately
 became sentient and took over the world.  Hopefully yours is less
 ambitious, while still as powerful.
 
-## Isn't dctk just a rip-off of [sub]?
+# Isn't dctk just a rip-off of [sub]?
 
 dctk is inspired by sub but is rewritten from the ground up and adds
 significant new features:
 
+  - easier integration of existing projects as subcommands
+
 Future:
 
   - hierarchical subcommands which can be nested in directories
-
-  - easier integration of existing projects as subcommands
 
   - support for multiple top-level commands in one trapper-keeper
 
@@ -242,9 +255,9 @@ Future:
 
   - docopt support
 
-## License
+# License
 
-Apache 2.0. See `LICENSE`.
+Apache 2.0. See `LICENSE.md`.
 
 Because this is a ground-up rewrite of [sub], it does not contain the
 code of the sub project and is licensed under the Apache license rather

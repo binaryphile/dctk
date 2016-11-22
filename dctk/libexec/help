@@ -23,8 +23,8 @@ main() {
   libexec=$(realpath "$BASH_SOURCE")
   libexec=$(dirname "$libexec")
 
-  # provide dctk completions
-  is_same_as --complete "${1:-}" && exec "$libexec"/dctk-commands
+  # provide completions
+  is_same_as --complete "${1:-}" && exec "$libexec"/commands
 
   command=${1:-}
   case $command in
@@ -44,7 +44,7 @@ command_path() {
   local command=$1
   local libexec=$2
 
-  command -v "$libexec"/dctk-"$command" || command -v "$libexec"/dctk-sh-"$command" ||:
+  command -v "$libexec"/"$command" || command -v "$libexec"/sh-"$command" ||:
 }
 
 help() {
@@ -79,7 +79,7 @@ print_summaries() {
 
   columns=$(tput cols)
 
-  for command in $("$libexec"/dctk-commands); do
+  for command in $("$libexec"/commands); do
     file=$(command_path "$command" "$libexec")
     ! is_symlink "$file" || continue
     summary=$(summary "$file")

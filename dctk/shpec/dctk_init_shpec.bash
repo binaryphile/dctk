@@ -4,13 +4,11 @@ initialize_shpec_helper
 root=$(realpath "$BASH_SOURCE")
 root=$(dirname "$root")
 root=$(absolute_path "$root"/..)
-libexec=$root/libexec
+libexec=$root/dctk/libexec
 bin=$root/bin
 
-PATH=$libexec:$PATH
 
-
-describe "dctk-init"
+describe "init"
   it "outputs a message with no input"; ( _shpec_failures=0   # shellcheck disable=SC2030
 
     define expected <<'EOS'
@@ -22,7 +20,7 @@ EOS
 
     # shellcheck disable=SC2030,SC2059
     printf -v expected "$expected" "$bin"
-    result=$("$libexec"/dctk-init 2>&1)
+    result=$("$libexec"/init 2>&1)
     # shellcheck disable=SC2016,SC2154
     assert equal "$expected" "$result"
 
@@ -34,26 +32,11 @@ EOS
     define expected <<'EOS'
 export PATH=$PATH:%s
 source %s/completions/dctk.bash
-_dctk_wrapper() {
-  local command=$1
-
-  (( $# > 0 )) && shift
-
-  case $command in
-    "shell" )
-      eval $(dctk sh-"$command" "$@")
-      ;;
-    * )
-      command dctk "$command" "$@"
-      ;;
-  esac
-}
-alias dctk=_dctk_wrapper
 EOS
 
     # shellcheck disable=SC2031,SC2059
     printf -v expected "$expected" "$bin" "$root"
-    result=$("$libexec"/dctk-init -)
+    result=$("$libexec"/init -)
     # shellcheck disable=SC2016
     assert equal "$expected" "$result"
 

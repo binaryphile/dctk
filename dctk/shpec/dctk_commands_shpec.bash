@@ -3,20 +3,22 @@ initialize_shpec_helper
 
 libexec=$(realpath "$BASH_SOURCE")
 libexec=$(dirname "$libexec")
-libexec=$(absolute_path "$libexec"/../libexec)
+libexec=$(absolute_path "$libexec"/../dctk/libexec)
 
 PATH=$libexec:$PATH
 
 
-describe "dctk-completions"
-  it "outputs a message with input commands"; ( _shpec_failures=0   # shellcheck disable=SC2030
+describe "commands"
+  it "outputs a message with no input"; ( _shpec_failures=0   # shellcheck disable=SC2030
 
     define expected <<'EOS'
---sh
---no-sh
+commands
+completions
+help
+init
 EOS
 
-    result=$("$libexec"/dctk-completions commands)
+    result=$("$libexec"/commands)
     # shellcheck disable=SC2154
     assert equal "$expected" "$result"
 
@@ -30,10 +32,9 @@ commands
 completions
 help
 init
-shell
 EOS
 
-    result=$("$libexec"/dctk-completions help)
+    result=$("$libexec"/commands help)
     # shellcheck disable=SC2154
     assert equal "$expected" "$result"
 
