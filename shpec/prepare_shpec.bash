@@ -98,7 +98,7 @@ EOS
     ! is_symlink "$dir"/bin/dctk
     assert equal 0 "$?"
 
-    assert equal ../dctk/name "$(readlink "$dir"/bin/name)"
+    assert equal ../dctk/bin/dctk "$(readlink "$dir"/bin/name)"
 
     # shellcheck disable=SC2154
     $rm "$dir"

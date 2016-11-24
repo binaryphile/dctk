@@ -4,7 +4,7 @@ initialize_shpec_helper
 root=$(realpath "$BASH_SOURCE")
 root=$(dirname "$root")
 root=$(absolute_path "$root"/..)
-libexec=$root/dctk/libexec
+libexec=$root/libexec
 bin=$root/bin
 
 

@@ -3,7 +3,7 @@ initialize_shpec_helper
 
 libexec=$(realpath "$BASH_SOURCE")
 libexec=$(dirname "$libexec")
-libexec=$(absolute_path "$libexec"/../dctk/libexec)
+libexec=$(absolute_path "$libexec"/../libexec)
 
 
 describe "completions"

@@ -50,7 +50,7 @@ main() {
   is_same_as "$prog" "$name" && { printf "$message" "$name" "$name"; exit ;}
 
   $rm "$bin/$prog"
-  ln -sf ../dctk/"$name" "$bin/$name"
+  ln -sf ../dctk/bin/dctk "$bin/$name"
 
   # shellcheck disable=SC2154
   $mkdir "$root/$name"

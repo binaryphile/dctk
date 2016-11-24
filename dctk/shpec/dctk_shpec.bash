@@ -3,7 +3,7 @@ initialize_shpec_helper
 
 dctk=$(realpath "$BASH_SOURCE")
 dctk=$(dirname "$dctk")
-dctk=$(absolute_path "$dctk"/../dctk/dctk)
+dctk=$(absolute_path "$dctk"/../bin/dctk)
 
 
 describe "dctk"
