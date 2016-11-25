@@ -37,6 +37,7 @@ main() {
   root=$(realpath "$BASH_SOURCE")
   root=$(dirname "$root")
   bin=$root/bin
+  completions=$root/completions
 
   name=$(to_lower "$name")
 
@@ -51,6 +52,9 @@ main() {
 
   $rm "$bin/$prog"
   ln -sf ../dctk/bin/dctk "$bin/$name"
+
+  $rm "$completions/$prog".bash
+  ln -sf ../dctk/completions/dctk.bash "$completions/$name".bash
 
   # shellcheck disable=SC2154
   $mkdir "$root/$name"

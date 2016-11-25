@@ -106,6 +106,26 @@ EOS
     return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
   end
 
+  it "renames completions/dctk"; ( _shpec_failures=0   # shellcheck disable=SC2030
+
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    cp -r "$root"/* "$dir"
+    cd "$dir"
+
+    result=$("$dir"/prepare name)
+
+    ! is_symlink "$dir"/completions/dctk
+    assert equal 0 "$?"
+
+    assert equal ../dctk/completions/dctk.bash "$(readlink "$dir"/completions/name.bash)"
+
+    # shellcheck disable=SC2154
+    $rm "$dir"
+
+    return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
+  end
+
   it "creates a name directory"; ( _shpec_failures=0   # shellcheck disable=SC2030
 
     # shellcheck disable=SC2154

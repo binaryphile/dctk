@@ -25,6 +25,7 @@ operates with the following basic tree structure (all are directories):
     ├─┬ dctk              # built-in functionality
     │ ├── libexec         # core dctk command and subcommands
     │ └── completions     # bash/zsh automatic completion code
+    ├── completions       # links for your commands to autocompletion
     ├── [command]         # your command's subcommands
     ├── [another command] # you can have more than one
     └─┬ [legacy command]  # when you already have or need more structure

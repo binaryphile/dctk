@@ -3,8 +3,8 @@ initialize_shpec_helper
 
 root=$(realpath "$BASH_SOURCE")
 root=$(dirname "$root")
-root=$(absolute_path "$root"/..)
-libexec=$root/libexec
+root=$(absolute_path "$root"/../..)
+libexec=$root/dctk/libexec
 bin=$root/bin
 
 
@@ -31,7 +31,7 @@ EOS
 
     define expected <<'EOS'
 export PATH=$PATH:%s
-source %s/completions/dctk.bash
+source %s/completions/*.bash
 EOS
 
     # shellcheck disable=SC2031,SC2059

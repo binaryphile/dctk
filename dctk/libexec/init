@@ -14,7 +14,6 @@ eval "$(%s/bin/dctk init -)"
 EOS
 
 main() {
-  local -a commands
   local libexec
   local path_format
   local print
@@ -22,7 +21,6 @@ main() {
   local root
   local shell
   local shell_format
-  local wrapper_format
 
   libexec=$(realpath "$BASH_SOURCE")
   libexec=$(dirname "$libexec")
@@ -60,7 +58,7 @@ main() {
 
   case $shell in
     "bash" | "zsh" )
-      shell_format='source %q/completions/dctk.%q'
+      shell_format='source %q/completions/*.%q'
       # shellcheck disable=SC2059,SC2154
       printf "$shell_format\n" "$root" "$shell"
       ;;
