@@ -6,6 +6,12 @@ readonly _dctk=loaded
 source kzn.bash
 initialize_kzn
 
+prog=$BASH_SOURCE
+prog=${prog##*/}
+export _DCTK_PROG=$prog
+
+error_message="%s: no such command '%s'"
+
 main() {
   local command=${1:-}
   local command_path
@@ -21,7 +27,8 @@ main() {
       ;;
     * )
       command_path=$libexec/$command
-      is_executable_file "$command_path" || errexit "dctk: no such command '$command'"
+      # shellcheck disable=SC2059
+      is_executable_file "$command_path" || errexit "$(printf "$error_message\n" "$prog" "$command")"
       shift
       exec "$command_path" "$@"
       ;;

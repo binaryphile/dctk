@@ -7,13 +7,17 @@ source kzn.bash
 initialize_kzn
 
 define usage_message <<'EOS'
-Usage: dctk <command> [<args>]
+Usage: %s <command> [<args>]
 
-Some useful dctk commands are:
+Some useful %s commands are:
 %s
 
-See 'dctk help <command>' for information on a specific command.\n
+See '%s help <command>' for information on a specific command.\n
 EOS
+
+prog=${_DCTK_PROG:-dctk}
+
+error_message="%s: no such command '%s'"
 
 main() {
   local command
@@ -30,11 +34,12 @@ main() {
   case $command in
     "" )
       # shellcheck disable=SC2059,SC2154
-      printf "$usage_message" "$(print_summaries "$libexec")"
+      printf "$usage_message" "$prog" "$prog" "$(print_summaries "$libexec")" "$prog"
       ;;
     * )
       file=$(command_path "$command" "$libexec")
-      is_given "$file" || errexit "dctk: no such command '$command'"
+      # shellcheck disable=SC2059
+      is_given "$file" || errexit "$(printf "$error_message\n" "$prog" "$command")"
       print_help "$file"
       ;;
   esac
@@ -48,7 +53,8 @@ command_path() {
 }
 
 help() {
-  awk '/^[^#]/{p=0} /^# Help:/{p=1} p' "$1" | sed "s/^# Help: //;s/^# //;s/^#//"
+  # shellcheck disable=SC2059
+  printf "$(awk '/^[^#]/{p=0} /^# Help:/{p=1} p' "$1" | sed "s/^# Help: //;s/^# //;s/^#//")" "$prog"
 }
 
 print_help() {
@@ -99,7 +105,8 @@ print_summaries() {
   done
 }
 
-summary() { sed -n "s/^# Summary: \(.*\)/\1/p" "$1" ;}
+# shellcheck disable=SC2059
+summary() { printf "$(sed -n -e "s/^# Summary: \(.*\)/\1/p" "$1")" "$prog" ;}
 
 truncate() {
   local max_length=$1
@@ -110,7 +117,8 @@ truncate() {
   puts "${string:0:$length}..."
 }
 
-usage() { sed -n "s/^# \(Usage: .*\)/\1/p" "$1"   ;}
+# shellcheck disable=SC2059
+usage() { printf "$(sed -n "s/^# \(Usage: .*\)/\1/p" "$1")" "$prog" ;}
 
 return 0 2>/dev/null ||:
 

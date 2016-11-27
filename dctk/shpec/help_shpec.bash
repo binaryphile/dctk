@@ -31,7 +31,6 @@ EOS
 Usage: dctk commands
 
 This command is mostly used for autocompletion in various shells, and for `dctk help`.
-Also, this command helps find commands that are named the same as potentially builtin shell commands (which, cd, etc)
 EOS
 
     result=$("$libexec"/help commands)
