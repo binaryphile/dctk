@@ -21,11 +21,10 @@ Each subcommand maps to a separate, standalone executable file. dctk
 operates with the following basic tree structure (all are directories):
 
     .
-    ├── bin               # link(s) to main dctk executable, but named after their [command](s)
+    ├── bin               # link(s) to main dctk executable, named after its/their command(s)
     ├─┬ dctk              # built-in functionality
-    │ ├── libexec         # core dctk command and subcommands
-    │ └── completions     # bash/zsh automatic completion code
-    ├── completions       # links for your commands to autocompletion
+    │ └── …
+    ├── completions       # autocompletion for your command(s)
     ├── [command]         # your command's subcommands
     ├── [another command] # you can have more than one
     └─┬ [legacy command]  # when you already have or need more structure
@@ -86,7 +85,7 @@ Then run the `prepare` script while in this directory:
 Third, add the following to your shell's startup script (.bash_profile
 or .zshrc, for example):
 
-    eval "$("$HOME"/[path to command]/bin/[command] init -)"
+    eval "$("$HOME"/[path to your dctk]/bin/[command] init -)"
 
 Finally, you may decide to get rid of the `.git` folder and start your
 own repository.
@@ -98,16 +97,16 @@ Once `prepare`d, dctk becomes the new command is invoked like so:
 # the dctk command
 
 Your command in `bin` is actually a link to the dctk script in
-`dctk/dctk`.  You can examine the file their to see the guts of dctk in
-action.
+`dctk/bin/dctk`.  You can examine the file there to see the guts of dctk
+in action.
 
 dctk determines your command name from how it was invoked on the
 command-line, so the fact that its filename doesn't match the command is
 not important.
 
-When this document refers to the `dctk` command, it means your command
-instead once you've `prepare`d the project.  Once `prepare`d, there is no
-`dctk` command.
+From here on out, when this document refers to the `dctk` command, it
+means your command instead, once you've `prepare`d the project.  To be
+clear, once `prepare`d, there is no `dctk` command.
 
 # what's in your trapper-keeper
 
@@ -135,7 +134,7 @@ named "rush", then the variable is `_RUSH_ROOT`.
 Subcommands live in the directory named for your command and are simply
 named for the subcommand, e.g. `rbenv/versions`.  For this reason you
 can't make a command with the same name as the existing directories,
-`bin` or `dctk`.  Anything else is fair game.
+`bin`, `dctk`, `completions` or `shpec`.  Anything else is fair game.
 
 Subcommands don't have to be written in bash.  They can be any
 executable, scripted or compiled.  Even symlinks work.
@@ -143,9 +142,9 @@ executable, scripted or compiled.  Even symlinks work.
 Subcommands can provide documentation in comments, automatically made
 available through the `dctk` and `dctk help [subcommand]` commands.
 
-Subcommands can also provide shell autocompletion via dctk by
-implementing a well-known flag (`--complete`).  dctk handles the details
-of informing the shell (bash and zsh supported).
+Subcommands can also provide shell autocompletion by implementing a
+well-known flag (`--complete`).  dctk handles the details of informing
+the shell (bash and zsh supported).
 
 Both of these features require the subcommand to be in a scripting
 language which employs "#" as its comment delimiter.
@@ -204,17 +203,15 @@ dctk provides autocompletion at two levels:
      (what arguments does this subcommand take?)
 
 Opting into autocompletion of subcommands requires that you add a magic
-comment of (make sure to replace with your trapper-keeper's name!):
+comment, like so:
 
     # provide completions
 
-Your script must also parse the flag `--complete`.  Here's an example
-from rbenv, namely `rbenv whence`:
+Your script must also parse the flag `--complete`.  Here's a made-up
+example from rbenv:
 
 ``` bash
 #!/usr/bin/env bash
-
-[[ -n $RBENV_DEBUG ]] && set -x
 
 # Provide rbenv completions
 if [[ $1 == "--complete" ]]; then
@@ -225,8 +222,8 @@ fi
 # etc...
 ```
 
-Passing the `--complete` flag to this subcommand short circuits its
-normal operation and instead returns the valid completions to the shell.
+Passing the `--complete` flag to this subcommand should short circuit
+its normal operation and instead echo the list of valid completions.
 dctk feeds this to your shell's autocompletion handler for you.
 
 # why a trapper-keeper?
@@ -234,8 +231,8 @@ dctk feeds this to your shell's autocompletion handler for you.
 dctk is meant to make it easy to assimilate any kind of technology into
 your trapper-keeper as a subcommand, much like *Dawson's Creek Trapper
 Keeper Ultra Keeper Futura S 2000* assimilated all of Cartman's
-belongings (as well as Cartman himself).  The trapper-keeper ultimately
-became sentient and took over the world.  Hopefully yours is less
+belongings (as well as Cartman himself).  His trapper-keeper ultimately
+became sentient and took over the world.  Hopefully yours will be less
 ambitious, while still as powerful.
 
 # Isn't dctk just a rip-off of [sub]?
@@ -243,13 +240,13 @@ ambitious, while still as powerful.
 dctk is inspired by sub but is rewritten from the ground up and adds
 significant new features:
 
-  - easier integration of existing projects as subcommands
+  - support for multiple top-level commands in one trapper-keeper
 
 Future:
 
   - hierarchical subcommands which can be nested in directories
 
-  - support for multiple top-level commands in one trapper-keeper
+  - easier integration of existing projects as subcommands
 
   - task functions within scripts which are subcommands of their own,
     with first-class support like other subcommands
@@ -259,10 +256,6 @@ Future:
 # License
 
 Apache 2.0. See `LICENSE.md`.
-
-Because this is a ground-up rewrite of [sub], it does not contain the
-code of the sub project and is licensed under the Apache license rather
-than that project's MIT license.
 
 [Dawson's Creek Trapper Keeper Ultra Keeper Futura S 2000]: https://en.wikipedia.org/wiki/Trapper_Keeper_(South_Park)
 [sub]:                                                      https://github.com/basecamp/sub
