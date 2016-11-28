@@ -8,10 +8,11 @@ initialize_kzn
 
 prog=${BASH_SOURCE##*/}
 export _DCTK_PROG=$prog
-source_path=$(readlink -f "$BASH_SOURCE")
-source_path=${source_path%/*}
+source_path=$(realpath "$BASH_SOURCE")
+source_path=$(dirname "$source_path")
 # shellcheck disable=SC2140
 eval export _"${prog^^}"_ROOT="$(absolute_path "$source_path"/../..)/$prog"
+unset -v source_path
 
 error_message="%s: no such command '%s'"
 
