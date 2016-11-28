@@ -1,12 +1,13 @@
 # dctk: organize your programs with *[Dawson's Creek Trapper Keeper Ultra Keeper Futura S 2000]*
 
-dctk is a basis for setting up your own shell programs to use
-subcommands, much like `git` or `rbenv`.  Subcommands are scripts or
-programs which are collected into your own personal command (we'll call
-it a trapper-keeper, to keep the joke going), which is a way to organize
-a large amount of functionality into a single command while preserving
-the virtues of small, independent scripts dedicated to individual
-concerns.
+dctk helps you set up your own command or commands, which use separate
+scripts as subcommands.  Such commands work much like `git` or `rbenv`.
+
+Subcommands are scripts or programs, independent of one another and
+dealing with individual concerns.
+
+Think of it as a way to organize a large amount of functionality into a
+single command, a sort of trapper-keeper, to keep the joke going.
 
 # examples
 
@@ -21,17 +22,12 @@ Each subcommand maps to a separate, standalone executable file. dctk
 operates with the following basic tree structure (all are directories):
 
     .
-    ├── bin               # link(s) to main dctk executable, named after its/their command(s)
+    ├── bin               # your command's link to the dctk executable
     ├─┬ dctk              # built-in functionality
     │ └── …
-    ├── completions       # autocompletion for your command(s)
+    ├── completions       # autocompletion for your command
     ├── [command]         # your command's subcommands
-    ├── [another command] # you can have more than one
-    └─┬ [legacy command]  # when you already have or need more structure
-      ├── bin             # if bin and/or libexec exist, look there instead for subcommands
-      ├── libexec         # for example, when importing an existing project or [sub]
-      ├── share           # or to separate out supporting files
-      └── other           # whatever you like
+    └── …
 
 # creating your first command
 
@@ -225,6 +221,63 @@ fi
 Passing the `--complete` flag to this subcommand should short circuit
 its normal operation and instead echo the list of valid completions.
 dctk feeds this to your shell's autocompletion handler for you.
+
+# multiple commands
+
+When you saw the directory tree earlier, it was for a single command.
+However you can have multiple commands as well, each independent of the
+other.
+
+    .
+    ├── bin               # your commands' links to the dctk executable
+    ├── completions       # your commands' links to the completions script
+    ├── …
+    ├── [command]         # one command's subcommands
+    ├── [another command] # you can have more than one
+    └── …
+
+Each command exists side-by-side in its own directory.  Each has its own
+subcommands.
+
+All that is required to become a command is for the directory to exist,
+and for there to be link with the command's name to the dctk executable:
+
+    $ mkdir [command]
+    $ cd bin
+    $ ln -sf ../dctk/bin/dctk [command]
+
+You should also enable completions for your command with a link:
+
+    $ cd ../completions
+    $ ln -sf ../dctk/completions/dctk.bash [command].bash   # or .zsh, if that's your shell
+
+Add subcommands to the [command] directory and you're good to go.
+
+# complex and legacy commands
+
+So far, you've seen simple commands.  Subcommands exist simply as
+executables in their command's directory.
+
+However, your subcommands may require more structure.  For example, you
+may have data files which might go in `[command]/share`.
+
+Or you may have a command which is already a project of its own, such as
+an existing [sub] or a repo you'd like to add as a git submodule.
+
+    .
+    ├── …
+    ├─┬ [complex command] # when you already have or need more structure
+    │ ├── bin             # if bin and/or libexec exist, look there instead for subcommands
+    │ ├── libexec         # for example, when importing an existing project or [sub]
+    │ ├── share           # or to separate out supporting files
+    │ └── other           # whatever you like
+    └── …
+
+If dctk sees a `[command]/bin` and/or `[command]/libexec` directory, it
+will treat the command as complex.  A complex command finds its
+subcommands in the `bin` and `libexec` subdirectories instead of the
+main `[command]` directory.  This allows you to have commands with more
+structure, or to use legacy commands without having to adapt them.
 
 # why a trapper-keeper?
 
