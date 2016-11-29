@@ -7,7 +7,8 @@ Subcommands are scripts or programs, independent of one another and
 dealing with individual concerns.
 
 Think of it as a way to organize a large amount of functionality into a
-single command, a sort of trapper-keeper, to keep the joke going.
+single command, like pages in a sort of trapper-keeper, to keep the joke
+going.
 
 # examples
 
@@ -279,7 +280,7 @@ subcommands in the `bin` and `libexec` subdirectories instead of the
 main `[command]` directory.  This allows you to have commands with more
 structure, or to use legacy commands without having to adapt them.
 
-# why a trapper-keeper?
+# why "trapper-keeper"?
 
 dctk is meant to make it easy to assimilate any kind of technology into
 your trapper-keeper as a subcommand, much like *Dawson's Creek Trapper
@@ -288,27 +289,27 @@ belongings (as well as Cartman himself).  His trapper-keeper ultimately
 became sentient and took over the world.  Hopefully yours will be less
 ambitious, while still as powerful.
 
-# Isn't dctk just a rip-off of [sub]?
+# isn't dctk just a rip-off of [sub]?
 
-dctk is inspired by sub but is rewritten from the ground up and adds
-significant new features:
+dctk is inspired by sub but shares very little code with it, having been
+significantly rewritten.  It also sports a number of new features:
 
-  - support for multiple top-level commands in one trapper-keeper
+  - multiple top-level commands in one trapper-keeper
 
 Future:
 
-  - hierarchical subcommands which can be nested in directories
+  - hierarchical subcommands by nesting directories
 
-  - easier integration of existing projects as subcommands
+  - simple integration of legacy commands
 
-  - task functions within scripts which are subcommands of their own,
-    with first-class support like other subcommands
+  - functions as subcommands
 
-  - docopt support
+  - [docopt] support
 
 # License
 
 Apache 2.0. See `LICENSE.md`.
 
 [Dawson's Creek Trapper Keeper Ultra Keeper Futura S 2000]: https://en.wikipedia.org/wiki/Trapper_Keeper_(South_Park)
-[sub]:                                                      https://github.com/basecamp/sub
+[sub]:    https://github.com/basecamp/sub
+[docopt]: http://docopt.org/
