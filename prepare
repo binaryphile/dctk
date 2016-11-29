@@ -9,7 +9,8 @@ initialize_kzn
 prog=dctk
 
 define message <<'EOS'
-Done! Enjoy your new %s! If you're happy with your %s, run:
+Done! Enjoy your new trapper-keeper! If you're happy with your trapper-keeper,
+run:
 
     rm -rf .git
     git init
@@ -17,15 +18,13 @@ Done! Enjoy your new %s! If you're happy with your %s, run:
     git commit -m 'Starting off %s'
     ./bin/%s init
 
-Made a mistake? Want to make a different %s? Run:
+Made a mistake? Want to make a different trapper-keeper? Run:
 
     git add .
     git checkout -f
 
-Thanks for making a %s!\n
+Thanks for making a trapper-keeper!\n
 EOS
-# shellcheck disable=SC2059
-printf -v message "$message" "$prog" "$prog" "%s" "%s" "$prog" "$prog"
 
 main() {
   local name=${1:-}

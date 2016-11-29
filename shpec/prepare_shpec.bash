@@ -24,7 +24,8 @@ describe "prepare"
 
     define expected <<'EOS'
 Preparing your 'name' dctk!
-Done! Enjoy your new dctk! If you're happy with your dctk, run:
+Done! Enjoy your new trapper-keeper! If you're happy with your trapper-keeper,
+run:
 
     rm -rf .git
     git init
@@ -32,12 +33,12 @@ Done! Enjoy your new dctk! If you're happy with your dctk, run:
     git commit -m 'Starting off name'
     ./bin/name init
 
-Made a mistake? Want to make a different dctk? Run:
+Made a mistake? Want to make a different trapper-keeper? Run:
 
     git add .
     git checkout -f
 
-Thanks for making a dctk!
+Thanks for making a trapper-keeper!
 EOS
 
     result=$("$dir"/prepare name)
