@@ -1,14 +1,14 @@
 # dctk: organize your programs with *[Dawson's Creek Trapper Keeper Ultra Keeper Futura S 2000]*
 
 dctk helps you set up your own command or commands, which use separate
-scripts as subcommands.  Such commands work much like `git` or `rbenv`.
+scripts as subcommands.  Such subcommands work much like git's or
+rbenv's subcommands.
 
 Subcommands are scripts or programs, independent of one another and
 dealing with individual concerns.
 
 Think of it as a way to organize a large amount of functionality into a
-single command, like pages in a sort of trapper-keeper, to keep the joke
-going.
+single command, like pages in a trapper-keeper, to keep the joke going.
 
 # examples
 
@@ -19,8 +19,10 @@ implemented as a trapper-keeper:
     $ rbenv versions           # runs the "versions" subcommand
     $ rbenv shell 1.9.3-p194   # runs the "shell" subcommand, passing "1.9.3-p194" as an argument
 
-Each subcommand maps to a separate, standalone executable file. dctk
-operates with the following basic tree structure (all are directories):
+Each subcommand maps to a separate, standalone executable file.
+
+dctk operates with the following basic tree structure (all are
+directories):
 
     .
     ├── bin               # your command's link to the dctk executable
@@ -60,13 +62,15 @@ adding a little bit more to your script, as you'll see.
 
 dctk, the project, is this repo and the code of which it is comprised.
 
-While it is invoked using the command `dctk` at the moment, which is a
-link in `bin`, the link will ultimately be renamed to your command's
-name.  This readme refers to the project and how it works as dctk, even
-though there won't be a `dctk` command after you `prepare` it.
+While it is invoked using the command `dctk` at the outset, the `dctk`
+command is replaced with your own after your customize it to your own
+needs.  `dctk` is just a link in `bin`, a link which will ultimately be
+renamed to your command's name.
 
-Your project will contain dctk's bones but will add the functionality
-that makes it your own command.
+This readme refers to the project and how it works as dctk, even though
+there won't be a `dctk` command after you run the `prepare` script to
+customize it.  Your project will contain dctk's bones but will add the
+functionality that makes it your own command.
 
 # installation
 
@@ -93,38 +97,32 @@ Once `prepare`d, dctk becomes the new command is invoked like so:
 
 # the dctk command
 
-Your command in `bin` is actually a link to the dctk script in
+After preparation, your command in `bin` is a link to the dctk script in
 `dctk/bin/dctk`.  You can examine the file there to see the guts of dctk
 in action.
 
-dctk determines your command name from how it was invoked on the
+dctk determines your command's name from how it was invoked on the
 command-line, so the fact that its filename doesn't match the command is
 not important.
 
 From here on out, when this document refers to the `dctk` command, it
-means your command instead, once you've `prepare`d the project.  To be
-clear, once `prepare`d, there is no `dctk` command.
+means your command instead, once you've prepared the project, so just
+visualize that command's name wherever it says `dctk`.
 
 # what's in your trapper-keeper
 
-Your trapper-keeper comes with a few basics built-in:
+Your trapper-keeper comes with a few subcommands already built-in:
 
-  - `dctk commands` - Print available subcommands
+  - `dctk commands` - print available subcommands
 
-  - `dctk completions` - Provide command completion details for use by shell
+  - `dctk completions` - provide command completion details for use by shell
     autocompletion
 
-  - `dctk help` - Parse and display subcommand help, if provided in the
+  - `dctk help` - parse and display subcommand help, if provided in the
     script
 
-  - `dctk init` - Hook completions into the shell, usually when invoked from
+  - `dctk init` - hook completions into the shell, usually when invoked from
     a shell startup file (e.g. `.bash_profile`)
-
-If you ever need to reference files inside of your trapper-keeper
-installation, say to access a file in the `share` directory, your
-trapper-keeper makes the location of its root directory available in the
-environment variable `_[COMMAND]_ROOT`.  For example, if your command is
-named "rush", then the variable is `_RUSH_ROOT`.
 
 # subcommands
 
@@ -143,23 +141,19 @@ Subcommands can also provide shell autocompletion by implementing a
 well-known flag (`--complete`).  dctk handles the details of informing
 the shell (bash and zsh supported).
 
-Both of these features require the subcommand to be in a scripting
-language which employs "#" as its comment delimiter.
-
 # self-documenting subcommands
 
 Documentation is provided by adding a few magic comments to your script.
 This feature is limited to scripts which use "#" as their comment
 delimiter.
 
-Here's an example from `rush who` (also see `dctk commands` for another
-example):
+Here's an example from `rush who`:
 
 ``` bash
 #!/usr/bin/env bash
 # Usage: rush who
 # Summary: Check who's logged in
-# Help: This will print out when you run `dctk help who`.
+# Help: This will print out when you run `rush help who`.
 # You can have multiple lines even!
 #
 #    Show off an example indented
@@ -173,7 +167,7 @@ Now, when you run `rush`, the "Summary" magic comment will now show up:
 
     usage: rush <command> [<args>]
 
-    Some useful dctk commands are:
+    Some useful rush commands are:
        commands               List all rush commands
        who                    Check who's logged in
 
@@ -193,40 +187,37 @@ then the "Help" comment block:
 
 dctk provides autocompletion at two levels:
 
-  1. autocompletion of subcommand names (what subcommands are available
-     in `libexec`?)
+  1. autocompletion of subcommand names (what subcommands are
+     available?)
 
-  2. opt-in autocompletion of potential arguments for your subcommands
-     (what arguments does this subcommand take?)
+  2. (optional) autocompletion of subcommand arguments (what arguments
+     does this subcommand take?)
 
-Opting into autocompletion of subcommands requires that you add a magic
-comment, like so:
+The second requires that you add a magic comment, like so:
 
-    # provide completions
+    # completions: true
 
-Your script must also parse the flag `--complete`.  Here's a made-up
-example from rbenv:
+Your script must also parse the flag `--complete`.  For example:
 
 ``` bash
 #!/usr/bin/env bash
 
-# Provide rbenv completions
+# completions: true
 if [[ $1 == "--complete" ]]; then
-  echo --path
-  exec rbenv shims --short
+  echo "--path"
 fi
 
 # etc...
 ```
 
-Passing the `--complete` flag to this subcommand should short circuit
-its normal operation and instead echo the list of valid completions.
-dctk feeds this to your shell's autocompletion handler for you.
+Your subcommand should echo the list of valid completions and exit when
+receiving the `--complete` flag instead of normal operation.  dctk feeds
+this output to your shell's autocompletion handler for you.
 
 # multiple commands
 
 When you saw the directory tree earlier, it was for a single command.
-However you can have multiple commands as well, each independent of the
+However you can have multiple commands as well, independent of each
 other.
 
     .
@@ -254,20 +245,20 @@ You should also enable completions for your command with a link:
 
 Add subcommands to the [command] directory and you're good to go.
 
-# complex and legacy commands
+# structured commands
 
 So far, you've seen simple commands.  Subcommands exist simply as
 executables in their command's directory.
 
-However, your subcommands may require more structure.  For example, you
-may have data files which might go in `[command]/share`.
+However, your commands may require more structure.  For example, you may
+have data files which might go in `[command]/share`.
 
 Or you may have a command which is already a project of its own, such as
 an existing [sub] or a repo you'd like to add as a git submodule.
 
     .
     ├── …
-    ├─┬ [complex command] # when you already have or need more structure
+    ├─┬ [command]
     │ ├── bin             # if bin and/or libexec exist, look there instead for subcommands
     │ ├── libexec         # for example, when importing an existing project or [sub]
     │ ├── share           # or to separate out supporting files
@@ -275,10 +266,16 @@ an existing [sub] or a repo you'd like to add as a git submodule.
     └── …
 
 If dctk sees a `[command]/bin` and/or `[command]/libexec` directory, it
-will treat the command as complex.  A complex command finds its
+will treat the command as structured.  A structured command finds its
 subcommands in the `bin` and `libexec` subdirectories instead of the
-main `[command]` directory.  This allows you to have commands with more
-structure, or to use legacy commands without having to adapt them.
+main `[command]` directory (with `bin` taking priority in conflicts).
+
+If you ever need to reference files in other subdirectories of your
+structured command, say to access a file in the `[command]/share`
+directory, dctk provides the environment variable `_[COMMAND]_ROOT`.
+For example, if your command is named "rush", then the variable is
+`_RUSH_ROOT`, which expands to `[path to dctk]/rush`.  That would make
+the share folder `$_RUSH_ROOT/share`.
 
 # why "trapper-keeper"?
 
@@ -296,11 +293,12 @@ significantly rewritten.  It also sports a number of new features:
 
   - multiple top-level commands in one trapper-keeper
 
+  - structured commands
+
+
 Future:
 
   - hierarchical subcommands by nesting directories
-
-  - simple integration of legacy commands
 
   - functions as subcommands
 
