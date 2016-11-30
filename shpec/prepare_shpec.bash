@@ -116,10 +116,12 @@ EOS
 
     result=$("$dir"/prepare name)
 
-    ! is_symlink "$dir"/completions/dctk
+    ! is_symlink "$dir"/completions/dctk.bash
+    ! is_symlink "$dir"/completions/dctk.zsh
     assert equal 0 "$?"
 
     assert equal ../dctk/completions/dctk.bash "$(readlink "$dir"/completions/name.bash)"
+    assert equal ../dctk/completions/dctk.zsh "$(readlink "$dir"/completions/name.zsh)"
 
     # shellcheck disable=SC2154
     $rm "$dir"

@@ -1,10 +1,7 @@
-[[ $- == *i* ]] || return 0
-
-name=$BASH_SOURCE
-name=$(basename "$name")
+name=${BASH_SOURCE##*/}
 name=${name%.*}
 
-read -d "" func <<'EOS' ||:
+read -rd "" func <<'EOS' ||:
 _%s() {
   local command
   local completions
@@ -27,4 +24,5 @@ eval "$(printf "$func" "$name" "$name" "$name")"
 
 complete -F _"$name" "$name"
 
+unset -v func
 unset -v name

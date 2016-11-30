@@ -50,10 +50,13 @@ main() {
   is_same_as "$prog" "$name" && { printf "$message" "$name" "$name"; exit ;}
 
   $rm "$bin/$prog"
-  ln -sf ../dctk/bin/dctk "$bin/$name"
+  ln -sf ../"$prog"/bin/"$prog" "$bin/$name"
 
   $rm "$completions/$prog".bash
-  ln -sf ../dctk/completions/dctk.bash "$completions/$name".bash
+  ln -sf ../"$prog"/completions/"$prog".bash "$completions/$name".bash
+
+  $rm "$completions/$prog".zsh
+  ln -sf ../"$prog"/completions/"$prog".zsh "$completions/$name".zsh
 
   # shellcheck disable=SC2154
   $mkdir "$root/$name"

@@ -44,12 +44,15 @@ EOS
     "$dir"/prepare rush >/dev/null
 
     define expected <<'EOS'
-export PATH=$PATH:%s
-source %s/completions/*.bash
+export PATH=$PATH:%q/bin
+for file in %q/completions/*.bash; do
+  source "$file"
+done
+unset -v file
 EOS
 
     # shellcheck disable=SC2031,SC2059
-    printf -v expected "$expected" "$dir"/bin "$dir"
+    printf -v expected "$expected" "$dir" "$dir"
     result=$("$dir"/bin/rush init -)
     # shellcheck disable=SC2016
     assert equal "$expected" "$result"

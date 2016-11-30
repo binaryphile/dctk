@@ -17,10 +17,13 @@ main() {
   libexec=$(dirname "$libexec")
   command_path=$libexec/$command
 
-  grep -qi "# completions: true" "$command_path" || return 0
+  is_shell_script "$command_path" || return 0
+  grep -qi "#"" completions: true" "$command_path" || return 0
   shift
   exec "$command_path" --complete "$@"
 }
+
+is_shell_script() { [[ $(file --mime-type --brief "$1") == "text/x-shellscript" ]] ;}
 
 return 0 2>/dev/null ||:
 

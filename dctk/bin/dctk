@@ -23,7 +23,7 @@ main() {
 
   libexec=$(realpath "$BASH_SOURCE")
   libexec=$(dirname "$libexec")
-  libexec=$libexec/../libexec
+  libexec=$(absolute_path "$libexec"/../libexec)
 
   case $command in
     "" | "-h" | "--help" )

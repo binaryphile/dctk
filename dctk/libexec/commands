@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Completions: true
 # Usage: %s commands
 # Summary: List all %s commands
 # Help: This command is mostly used for autocompletion in various shells, and for `%s help`.
@@ -15,9 +14,6 @@ main() {
 
   libexec=$(realpath "$BASH_SOURCE")
   libexec=$(dirname "$libexec")
-
-  # shellcheck disable=SC2154
-  is_same_as --complete "${1:-}" && { puts "$completions"; exit ;}
 
   list_commands "$libexec" | uniq | sort
 }

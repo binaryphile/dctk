@@ -1,0 +1,1 @@
+../dctk/completions/dctk.zsh

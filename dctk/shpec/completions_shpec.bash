@@ -25,7 +25,7 @@ EOS
     return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
   end
 
-  it "outputs a message with input help"; ( _shpec_failures=0   # shellcheck disable=SC2030
+  it "looks for the leading comment"; ( _shpec_failures=0   # shellcheck disable=SC2030
 
     # shellcheck disable=SC2016
     stub_command grep 'echo "$2"'
@@ -34,6 +34,15 @@ EOS
     result=$(main help)
     # shellcheck disable=SC2154
     assert equal "# completions: true" "$result"
+
+    return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
+  end
+
+  it "doesn't return a completion for completions"; ( _shpec_failures=0   # shellcheck disable=SC2030
+
+    result=$("$libexec"/completions completions)
+    # shellcheck disable=SC2154
+    assert equal "" "$result"
 
     return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
   end
