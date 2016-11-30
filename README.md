@@ -302,7 +302,6 @@ significantly rewritten.  It also sports a number of new features:
 
   - structured commands
 
-
 Future:
 
   - hierarchical subcommands by nesting directories

@@ -15,18 +15,26 @@ define error_message <<'EOS'
 eval "$(%s/bin/%s init -)"
 EOS
 
+define shell_format <<'EOS'
+for file in %q/*.%s; do
+  source "$file"
+done
+unset -v file
+EOS
+
 main() {
+  local completions
   local libexec
   local path_format
   local print
   local profile
   local root
   local shell
-  local shell_format
 
   libexec=$(realpath "$BASH_SOURCE")
   libexec=$(dirname "$libexec")
   root=$(absolute_path "$libexec"/../..)
+  completions=$root/completions
 
   print=""
   is_same_as - "${1:-}" && { print=1; shift ;}
@@ -60,9 +68,8 @@ main() {
 
   case $shell in
     "bash" | "zsh" )
-      shell_format='source %q/completions/*.%q'
       # shellcheck disable=SC2059,SC2154
-      printf "$shell_format\n" "$root" "$shell"
+      printf "$shell_format\n" "$completions" "$shell"
       ;;
   esac
 }

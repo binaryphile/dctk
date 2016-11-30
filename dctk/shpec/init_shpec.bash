@@ -6,6 +6,7 @@ root=$(dirname "$root")
 root=$(absolute_path "$root"/../..)
 libexec=$root/dctk/libexec
 bin=$root/bin
+completions=$root/completions
 
 
 describe "init"
@@ -27,15 +28,18 @@ EOS
     return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
   end
 
-  it "outputs a message with input help"; ( _shpec_failures=0   # shellcheck disable=SC2030
+  it "outputs a message with input -"; ( _shpec_failures=0   # shellcheck disable=SC2030
 
     define expected <<'EOS'
 export PATH=$PATH:%s
-source %s/completions/*.bash
+for file in %q/*.bash; do
+  source "$file"
+done
+unset -v file
 EOS
 
     # shellcheck disable=SC2031,SC2059
-    printf -v expected "$expected" "$bin" "$root"
+    printf -v expected "$expected" "$bin" "$completions"
     result=$("$libexec"/init -)
     # shellcheck disable=SC2016
     assert equal "$expected" "$result"
