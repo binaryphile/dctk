@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Completions: true
 
 [[ -n $_dctk_help ]] && return
 readonly _dctk_help=loaded
@@ -27,7 +28,6 @@ main() {
   libexec=$(realpath "$BASH_SOURCE")
   libexec=$(dirname "$libexec")
 
-  # provide completions
   is_same_as --complete "${1:-}" && exec "$libexec"/commands
 
   command=${1:-}

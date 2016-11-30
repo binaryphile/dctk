@@ -143,7 +143,7 @@ the shell (bash and zsh supported).
 
 # self-documenting subcommands
 
-Documentation is provided by adding a few magic comments to your script.
+Documentation is provided by adding leading comments to your script.
 This feature is limited to scripts which use "#" as their comment
 delimiter.
 
@@ -183,6 +183,9 @@ then the "Help" comment block:
 
     And maybe start off another one?
 
+Because it is free-form, the Help section must be the last of your
+leading comments in the script.
+
 # autocompletion
 
 dctk provides autocompletion at two levels:
@@ -193,9 +196,13 @@ dctk provides autocompletion at two levels:
   2. (optional) autocompletion of subcommand arguments (what arguments
      does this subcommand take?)
 
-The second requires that you add a magic comment, like so:
+The second requires that you add another leading comment, like so:
 
-    # completions: true
+``` bash
+#!/usr/bin/env bash
+# Completions: true
+# Usage: rush who
+```
 
 Your script must also parse the flag `--complete`.  For example:
 

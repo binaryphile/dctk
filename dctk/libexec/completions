@@ -17,7 +17,7 @@ main() {
   libexec=$(dirname "$libexec")
   command_path=$libexec/$command
 
-  grep -qi "# provide completions" "$command_path" || return 0
+  grep -qi "# completions: true" "$command_path" || return 0
   shift
   exec "$command_path" --complete "$@"
 }
