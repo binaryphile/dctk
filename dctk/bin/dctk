@@ -6,31 +6,44 @@ readonly _dctk=loaded
 source kzn.bash
 initialize_kzn
 
-prog=${BASH_SOURCE##*/}
+prog=$(basename "$BASH_SOURCE")
 export _DCTK_PROG=$prog
-source_path=$(realpath "$BASH_SOURCE")
-source_path=$(dirname "$source_path")
-# shellcheck disable=SC2140
-eval export _"${prog^^}"_ROOT="$(absolute_path "$source_path"/../..)/$prog"
-unset -v source_path
-
-error_message="%s: no such command '%s'"
 
 main() {
-  local command=${1:-}
-  local command_path
+  local -A env
+  local -A messages
   local libexec
+  local source_path
+
+  env[command]=${1:-}
 
   libexec=$(realpath "$BASH_SOURCE")
   libexec=$(dirname "$libexec")
   libexec=$(absolute_path "$libexec"/../libexec)
+  env[libexec]=$libexec
+
+  source_path=$(realpath "$BASH_SOURCE")
+  source_path=$(dirname "$source_path")
+  # shellcheck disable=SC2140
+  eval export _"${prog^^}"_ROOT="$(absolute_path "$source_path"/../..)/$prog"
+
+  messages[no_such_command]='%s: no such command "%s"'
+
+  route env messages :env :messages
+}
+
+route() {
+  local params=( command libexec no_such_command :env :messages )
+  eval "$(instantiate "${#params}" "${params[@]}" "$@")"
+
+  local command_path
 
   case $command in
     "" | "-h" | "--help" )
       exec "$libexec"/help
       ;;
     * )
-      command_path=$libexec/$command
+      command_path=$(find_command :env)
       # shellcheck disable=SC2059
       is_executable_file "$command_path" || errexit "$(printf "$error_message\n" "$prog" "$command")"
       shift
