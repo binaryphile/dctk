@@ -17,8 +17,7 @@ main() {
   libexec=$(dirname "$libexec")
   command_path=$libexec/$command
 
-  is_script "$command_path" || return 0
-  grep -qi "#"" completions: true" "$command_path" || return 0
+  { is_script "$command_path" && grep -qi "#"" completions: true" <<<"$(head "$command_path")" ;} || return 0
   shift
   exec "$command_path" --complete "$@"
 }
