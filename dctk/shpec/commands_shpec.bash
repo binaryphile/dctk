@@ -6,37 +6,38 @@ root=$(dirname "$root")
 root=$(absolute_path "$root"/../..)
 libexec=$root/dctk/libexec
 
-
-describe "commands"
-  it "outputs a message with no input"; ( _shpec_failures=0   # shellcheck disable=SC2030
-
-    define expected <<'EOS'
-commands
-completions
-help
-init
-EOS
+describe 'commands'
+  it 'outputs a message with no input'
+    (
+    defs expected <<'    EOS'
+      commands
+      completions
+      help
+      init
+    EOS
 
     result=$("$libexec"/commands)
     # shellcheck disable=SC2154
     assert equal "$expected" "$result"
 
-    return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
+    return "$_shpec_failures"
+    )
   end
 
-  it "outputs a message with input help"; ( _shpec_failures=0   # shellcheck disable=SC2030
-
-    define expected <<'EOS'
-commands
-completions
-help
-init
-EOS
+  it 'outputs a message with input help'
+    (
+    defs expected <<'    EOS'
+      commands
+      completions
+      help
+      init
+    EOS
 
     result=$("$libexec"/commands help)
     # shellcheck disable=SC2154
     assert equal "$expected" "$result"
 
-    return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
+    return "$_shpec_failures"
+    )
   end
 end

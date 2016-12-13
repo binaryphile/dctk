@@ -6,48 +6,51 @@ root=$(dirname "$root")
 root=$(absolute_path "$root"/../..)
 bin=$root/dctk/bin
 
+describe 'dctk'
+  it 'outputs a message with no input'
+    (
+    defs expected <<'    EOS'
+      Usage: dctk <command> [<args>]
 
-describe "dctk"
-  it "outputs a message with no input"; ( _shpec_failures=0   # shellcheck disable=SC2030
+      Some useful dctk commands are:
+         commands  List all dctk commands
 
-    define expected <<'EOS'
-Usage: dctk <command> [<args>]
-
-Some useful dctk commands are:
-   commands  List all dctk commands
-
-See 'dctk help <command>' for information on a specific command.
-EOS
+      See 'dctk help <command>' for information on a specific command.
+    EOS
 
     result=$("$bin"/dctk)
     #shellcheck disable=SC2154
     assert equal "$expected" "$result"
 
-    return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
+    # shellcheck disable=SC2154
+    return "$_shpec_failures"
+    )
   end
 
-  it "outputs a message with input help"; ( _shpec_failures=0   # shellcheck disable=SC2030
+  it 'outputs a message with input help'
+    (
+    defs expected <<'    EOS'
+      Usage: dctk <command> [<args>]
 
-    define expected <<'EOS'
-Usage: dctk <command> [<args>]
+      Some useful dctk commands are:
+        commands  List all dctk commands
 
-Some useful dctk commands are:
-   commands  List all dctk commands
-
-See 'dctk help <command>' for information on a specific command.
-EOS
+      See 'dctk help <command>' for information on a specific command.
+    EOS
 
     result=$("$bin"/dctk help)
     assert equal "$expected" "$result"
 
-    return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
+    return "$_shpec_failures"
+    )
   end
 
-  it "sets the _DCTK_ROOT environment variable"; ( _shpec_failures=0   # shellcheck disable=SC2030
-
+  it 'sets the _DCTK_ROOT environment variable'
+    (
     source "$bin"/dctk
     assert equal "$root"/dctk "$_DCTK_ROOT"
 
-    return "$_shpec_failures" ); (( _shpec_failures += $? )) ||:
+    return "$_shpec_failures"
+    )
   end
 end
