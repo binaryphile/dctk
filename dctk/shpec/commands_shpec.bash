@@ -7,8 +7,7 @@ root=$(absolute_path "$root"/../..)
 libexec=$root/dctk/libexec
 
 describe 'commands'
-  it 'outputs a message with no input'
-    (
+  it 'outputs a message with no input'; (
     defs expected <<'    EOS'
       commands
       completions
@@ -21,11 +20,9 @@ describe 'commands'
     assert equal "$expected" "$result"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 
-  it 'outputs a message with input help'
-    (
+  it 'outputs a message with input help'; (
     defs expected <<'    EOS'
       commands
       completions
@@ -38,6 +35,5 @@ describe 'commands'
     assert equal "$expected" "$result"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 end

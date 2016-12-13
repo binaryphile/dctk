@@ -7,8 +7,7 @@ root=$(absolute_path "$root"/../..)
 bin=$root/dctk/bin
 
 describe 'dctk'
-  it 'outputs a message with no input'
-    (
+  it 'outputs a message with no input'; (
     defs expected <<'    EOS'
       Usage: dctk <command> [<args>]
 
@@ -24,11 +23,9 @@ describe 'dctk'
 
     # shellcheck disable=SC2154
     return "$_shpec_failures"
-    )
-  end
+  ); end
 
-  it 'outputs a message with input help'
-    (
+  it 'outputs a message with input help'; (
     defs expected <<'    EOS'
       Usage: dctk <command> [<args>]
 
@@ -42,15 +39,12 @@ describe 'dctk'
     assert equal "$expected" "$result"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 
-  it 'sets the _DCTK_ROOT environment variable'
-    (
+  it 'sets the _DCTK_ROOT environment variable'; (
     source "$bin"/dctk
     assert equal "$root"/dctk "$_DCTK_ROOT"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 end

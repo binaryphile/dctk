@@ -6,8 +6,7 @@ libexec=$(dirname "$libexec")
 libexec=$(absolute_path "$libexec"/../libexec)
 
 describe 'help'
-  it 'outputs a message with no input'
-    (
+  it 'outputs a message with no input'; (
     defs expected <<'    EOS'
       Usage: dctk <command> [<args>]
 
@@ -22,11 +21,9 @@ describe 'help'
     assert equal "$expected" "$result"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 
-  it 'outputs a message for commands'
-    (
+  it 'outputs a message for commands'; (
     defs expected <<'    EOS'
       Usage: dctk commands
 
@@ -38,33 +35,26 @@ describe 'help'
     assert equal "$expected" "$result"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 
-  it 'outputs a message for completions'
-    (
+  it 'outputs a message for completions'; (
     result=$("$libexec"/help completions)
     assert equal "Sorry, this command isn't documented yet." "$result"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 
-  it 'outputs a message for help'
-    (
+  it 'outputs a message for help'; (
     result=$("$libexec"/help help)
     assert equal "Sorry, this command isn't documented yet." "$result"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 
-  it 'outputs a message for init'; ( _shpec_failures=0   # shellcheck disable=SC2030
-    (
+  it 'outputs a message for init'; (
     result=$("$libexec"/help init)
     assert equal "Sorry, this command isn't documented yet." "$result"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 end

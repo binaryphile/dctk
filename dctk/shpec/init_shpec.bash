@@ -9,8 +9,7 @@ bin=$root/bin
 completions=$root/completions
 
 describe 'init'
-  it 'outputs a message with no input'
-    (
+  it 'outputs a message with no input'; (
     defs expected <<'    EOS'
       # Load dctk automatically by adding
       # the following to ~/.bash_profile:
@@ -25,11 +24,9 @@ describe 'init'
     assert equal "$expected" "$result"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 
-  it 'outputs a message with input -'
-    (
+  it 'outputs a message with input -'; (
     defs expected <<'    EOS'
       export PATH=$PATH:%s
       for file in %q/*.bash; do
@@ -45,6 +42,5 @@ describe 'init'
     assert equal "$expected" "$result"
 
     return "$_shpec_failures"
-    )
-  end
+  ); end
 end
