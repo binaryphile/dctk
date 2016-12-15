@@ -6,53 +6,71 @@ readonly _dctk=loaded
 source kzn.bash
 initialize_kzn
 
-prog=$(basename "$BASH_SOURCE")
-export _DCTK_PROG=$prog
-
-main() {
-  local -A env
-  local -A messages
-  local libexec
+dctk_exports() {
   local source_path
 
-  env[command]=${1:-}
-
-  libexec=$(realpath "$BASH_SOURCE")
-  libexec=$(dirname "$libexec")
-  libexec=$(absolute_path "$libexec"/../libexec)
-  env[libexec]=$libexec
+  _DCTK_PROG=$(basename "$BASH_SOURCE")
+  export _DCTK_PROG
 
   source_path=$(realpath "$BASH_SOURCE")
   source_path=$(dirname "$source_path")
   # shellcheck disable=SC2140
-  eval export _"${prog^^}"_ROOT="$(absolute_path "$source_path"/../..)/$prog"
+  eval export _"${_DCTK_PROG^^}"_ROOT="$(absolute_path "$source_path"/../..)/$_DCTK_PROG"
+}
 
+dctk_main() {
+  local -A env
+  local -A messages
+  local libexec
+
+  # shellcheck disable=SC2154
+  env[command]=${1:-}
+  # shellcheck disable=SC2154
+  env[prog]=$_DCTK_PROG
+
+  libexec=$(realpath "$BASH_SOURCE")
+  libexec=$(dirname "$libexec")
+  libexec=$(absolute_path "$libexec"/../libexec)
+  # shellcheck disable=SC2034
+  env[libexec]=$libexec
+
+  # shellcheck disable=SC2034,SC2154
   messages[no_such_command]='%s: no such command "%s"'
 
-  route env messages :env :messages
+  route env :env :messages
 }
 
 route() {
-  local params=( command libexec no_such_command :env :messages )
-  eval "$(instantiate "${#params}" "${params[@]}" "$@")"
+  local params=( :env command prog libexec no_such_command )
+  eval "$(instantiate "${#params[@]}" "${params[@]}" "$@")"
 
   local command_path
 
-  case $command in
+  case ${command:-} in
     "" | "-h" | "--help" )
       exec "$libexec"/help
       ;;
     * )
-      command_path=$(find_command :env)
-      # shellcheck disable=SC2059
-      is_executable_file "$command_path" || errexit "$(printf "$error_message\n" "$prog" "$command")"
+      # shellcheck disable=SC2059,SC2154
+      command_path=$(find_command :env) || errexit "$(printf "$no_such_command\n" "$prog" "$command")"
       shift
       exec "$command_path" "$@"
       ;;
   esac
 }
 
+find_command() {
+  local params=( command libexec )
+  eval "$(instantiate "${#params[@]}" "${params[@]}" "$@")"
+
+  local command_path=$libexec/$command
+
+  is_executable_file "$command_path" || return
+  puts "$command_path"
+}
+
 return 0 2>/dev/null ||:
 
 strict_mode on
-main "$@"
+dctk_exports
+dctk_main "$@"
