@@ -8,32 +8,33 @@ libexec=$root/dctk/libexec
 
 describe 'commands'
   it 'outputs a message with no input'; (
-    defs expected <<'    EOS'
+    defs expected <<'EOS'
       commands
       completions
       help
       init
-    EOS
+EOS
 
     result=$("$libexec"/commands)
     # shellcheck disable=SC2154
     assert equal "$expected" "$result"
 
-    return "$_shpec_failures"
-  ); end
+    # shellcheck disable=SC2154
+    return "$_shpec_failures" )
+  end
 
   it 'outputs a message with input help'; (
-    defs expected <<'    EOS'
+    defs expected <<'EOS'
       commands
       completions
       help
       init
-    EOS
+EOS
 
     result=$("$libexec"/commands help)
     # shellcheck disable=SC2154
     assert equal "$expected" "$result"
 
-    return "$_shpec_failures"
-  ); end
+    return "$_shpec_failures" )
+  end
 end

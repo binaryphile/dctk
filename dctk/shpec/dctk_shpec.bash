@@ -8,14 +8,14 @@ bin=$root/dctk/bin
 
 describe 'dctk'
   it 'outputs a message with no input'; (
-    defs expected <<'    EOS'
+    defs expected <<'EOS'
       Usage: dctk <command> [<args>]
 
       Some useful dctk commands are:
          commands  List all dctk commands
 
       See 'dctk help <command>' for information on a specific command.
-    EOS
+EOS
 
     result=$("$bin"/dctk)
     #shellcheck disable=SC2154
@@ -26,14 +26,14 @@ describe 'dctk'
   ); end
 
   it 'outputs a message with input help'; (
-    defs expected <<'    EOS'
+    defs expected <<'EOS'
       Usage: dctk <command> [<args>]
 
       Some useful dctk commands are:
         commands  List all dctk commands
 
       See 'dctk help <command>' for information on a specific command.
-    EOS
+EOS
 
     result=$("$bin"/dctk help)
     assert equal "$expected" "$result"
