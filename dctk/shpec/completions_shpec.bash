@@ -9,37 +9,33 @@ source "$libexec"/completions
 
 describe 'completions'
   it 'outputs a message with input help'; (
-    defs expected <<'    EOS'
+    defs expected <<'EOS'
       commands
       completions
       help
       init
-    EOS
-
+EOS
     result=$("$libexec"/completions help)
     # shellcheck disable=SC2154
     assert equal "$expected" "$result"
-
-    return "$_shpec_failures"
-  ); end
+    # shellcheck disable=SC2154
+    return "$_shpec_failures" )
+  end
 
   it 'looks for the leading comment'; (
     # shellcheck disable=SC2016
     stub_command grep 'echo "$2"'
     stub_command exec ':'
-
     result=$(main help)
     # shellcheck disable=SC2154
     assert equal "# completions: true" "$result"
-
-    return "$_shpec_failures"
-  ); end
+    return "$_shpec_failures" )
+  end
 
   it "doesn't return a completion for completions"; (
     result=$("$libexec"/completions completions)
     # shellcheck disable=SC2154
     assert equal "" "$result"
-
-    return "$_shpec_failures"
-  ); end
+    return "$_shpec_failures" )
+  end
 end

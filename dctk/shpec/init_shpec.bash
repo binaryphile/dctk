@@ -10,37 +10,34 @@ completions=$root/completions
 
 describe 'init'
   it 'outputs a message with no input'; (
-    defs expected <<'    EOS'
+    defs expected <<'EOS'
       # Load dctk automatically by adding
       # the following to ~/.bash_profile:
 
       eval "$(%s/dctk init -)"
-    EOS
-
+EOS
     # shellcheck disable=SC2030,SC2059
     printf -v expected "$expected" "$bin"
     result=$("$libexec"/init 2>&1)
     # shellcheck disable=SC2016,SC2154
     assert equal "$expected" "$result"
-
-    return "$_shpec_failures"
-  ); end
+    # shellcheck disable=SC2154
+    return "$_shpec_failures" )
+  end
 
   it 'outputs a message with input -'; (
-    defs expected <<'    EOS'
+    defs expected <<'EOS'
       export PATH=$PATH:%s
       for file in %q/*.bash; do
         source "$file"
       done
       unset -v file
-    EOS
-
+EOS
     # shellcheck disable=SC2031,SC2059
     printf -v expected "$expected" "$bin" "$completions"
     result=$("$libexec"/init -)
     # shellcheck disable=SC2016
     assert equal "$expected" "$result"
-
-    return "$_shpec_failures"
-  ); end
+    return "$_shpec_failures" )
+  end
 end
