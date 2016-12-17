@@ -9,6 +9,7 @@ describe 'prepare'
   it 'outputs a message with no input'; (
     result=$("$root"/prepare 2>&1)
     assert equal 'usage: prepare name_of_your_dctk' "$result"
+    # shellcheck disable=SC2154
     return "$_shpec_failures" )
   end
 

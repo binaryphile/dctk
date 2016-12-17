@@ -44,3 +44,12 @@ EOS
     return "$_shpec_failures" )
   end
 end
+
+source "$bin"/dctk
+
+describe 'find_command'
+  it 'finds a command in libexec'; (
+    
+    return "$_shpec_failures" )
+  end
+end

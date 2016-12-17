@@ -5,8 +5,8 @@ root=$(realpath "$BASH_SOURCE")
 root=$(dirname "$root")
 root=$(absolute_path "$root"/..)
 
-describe "init"
-  it "outputs a message with no input"; (
+describe 'init'
+  it 'outputs a message with no input'; (
     # shellcheck disable=SC2154
     dir=$($mktempd) || return 1
     cp -r "$root"/* "$dir"
@@ -25,10 +25,11 @@ EOS
     assert equal "$expected" "$result"
     # shellcheck disable=SC2154
     $rm "$dir"
+    # shellcheck disable=SC2154
     return "$_shpec_failures" )
   end
 
-  it "outputs a message with input help"; (
+  it 'outputs a message with input help'; (
     # shellcheck disable=SC2154
     dir=$($mktempd) || return 1
     cp -r "$root"/* "$dir"
