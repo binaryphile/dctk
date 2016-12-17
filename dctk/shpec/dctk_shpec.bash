@@ -39,7 +39,8 @@ EOS
 
   it 'sets the _DCTK_ROOT environment variable'; (
     source "$bin"/dctk
-    assert equal "$root"/dctk "$_DCTK_ROOT"
+    dctk_exports
+    assert equal "$root"/dctk "$(printenv _DCTK_ROOT)"
     return "$_shpec_failures" )
   end
 end
