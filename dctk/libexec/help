@@ -7,13 +7,13 @@ readonly _dctk_help=loaded
 source kzn.bash
 initialize_kzn
 
-define usage_message <<'EOS'
-Usage: %s <command> [<args>]
+defs usage_message <<'EOS'
+  Usage: %s <command> [<args>]
 
-Some useful %s commands are:
-%s
+  Some useful %s commands are:
+  %s
 
-See '%s help <command>' for information on a specific command.\n
+  See '%s help <command>' for information on a specific command.\n
 EOS
 
 prog=${_DCTK_PROG:-dctk}

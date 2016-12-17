@@ -8,18 +8,18 @@ initialize_kzn
 
 prog=${_DCTK_PROG:-dctk}
 
-define error_message <<'EOS'
-# Load %s automatically by adding
-# the following to %s:
+defs error_message <<'EOS'
+  # Load %s automatically by adding
+  # the following to %s:
 
-eval "$(%s/bin/%s init -)"
+  eval "$(%s/bin/%s init -)"
 EOS
 
-define shell_format <<'EOS'
-for file in %q/*.%s; do
-  source "$file"
-done
-unset -v file
+defs shell_format <<'EOS'
+  for file in %q/*.%s; do
+    source "$file"
+  done
+  unset -v file
 EOS
 
 main() {
