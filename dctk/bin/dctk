@@ -24,7 +24,9 @@ dctk_main() {
   local libexec
 
   # shellcheck disable=SC2154
-  env[command]=${1:-}
+  env[command]=${1:-}; shift ||:
+  # shellcheck disable=SC2154
+  env[args]=$*
   # shellcheck disable=SC2154
   env[prog]=$_DCTK_PROG
 
@@ -37,11 +39,11 @@ dctk_main() {
   # shellcheck disable=SC2034,SC2154
   messages[no_such_command]='%s: no such command "%s"'
 
-  route env :env :messages
+  route :env :messages
 }
 
 route() {
-  local params=( :env command prog libexec no_such_command )
+  local params=( command args prog libexec no_such_command )
   eval "$(instantiate "${#params[@]}" "${params[@]}" "$@")"
 
   local command_path
@@ -52,9 +54,10 @@ route() {
       ;;
     * )
       # shellcheck disable=SC2059,SC2154
-      command_path=$(find_command :env) || errexit "$(printf "$no_such_command\n" "$prog" "$command")"
+      command_path=$(find_command "$command" "$libexec") || errexit "$(printf "$no_such_command\n" "$prog" "$command")"
       shift
-      exec "$command_path" "$@"
+      # shellcheck disable=SC2086
+      exec "$command_path" $args
       ;;
   esac
 }
