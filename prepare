@@ -6,27 +6,30 @@ readonly _dctk_prepare=loaded
 source kzn.bash
 initialize_kzn
 
-prog=dctk
+prepare_globals() {
+  prog=dctk
 
-define message <<'EOS'
-Done! Enjoy your new trapper-keeper! If you're happy with your trapper-keeper,
-run:
+  defs message <<'EOS'
+    Done! Enjoy your new trapper-keeper! If you're happy with your trapper-keeper,
+    run:
 
-    rm -rf .git
-    git init
-    git add .
-    git commit -m 'Starting off %s'
-    ./bin/%s init
+        rm -rf .git
+        git init
+        git add .
+        git commit -m 'Starting off %s'
+        ./bin/%s init
 
-Made a mistake? Want to make a different trapper-keeper? Run:
+    Made a mistake? Want to make a different trapper-keeper? Run:
 
-    git add .
-    git checkout -f
+        git add .
+        git checkout -f
 
-Thanks for making a trapper-keeper!\n
+    Thanks for making a trapper-keeper!
 EOS
+  printf -v message '%s\n' "$message"
+}
 
-main() {
+prepare_main() {
   local name=${1:-}
   local bin
   local root
@@ -68,4 +71,5 @@ main() {
 return 0 2>/dev/null ||:
 
 strict_mode on
-main "$@"
+prepare_globals
+prepare_main "$@"
