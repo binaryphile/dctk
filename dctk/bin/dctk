@@ -14,58 +14,49 @@ dctk_exports() {
 
   source_path=$(realpath "$BASH_SOURCE")
   source_path=$(dirname "$source_path")
-  # shellcheck disable=SC2140
-  eval export _"${_DCTK_PROG^^}"_ROOT="$(absolute_path "$source_path"/../..)/$_DCTK_PROG"
+  printf -v _"${_DCTK_PROG^^}"_ROOT '%s' "$(absolute_path "$source_path"/../..)/$_DCTK_PROG"
+  eval "$(printf 'export _%s_ROOT' "${_DCTK_PROG^^}")"
 }
 
 dctk_main() {
-  local -A env
-  local -A messages
-  local libexec
+  local command=${1:-}; shift ||:
+  local -a args=( "$@" )
+  local no_such_command
+  printf -v no_such_command '%s: no such command "%s"\n' "$_DCTK_PROG" "$command"
 
-  # shellcheck disable=SC2154
-  env[command]=${1:-}; shift ||:
-  # shellcheck disable=SC2154
-  env[args]=$*
-  # shellcheck disable=SC2154
-  env[prog]=$_DCTK_PROG
+  # shellcheck disable=SC2016
+  eval "$(printf 'local libexec=$_%s_ROOT/libexec' "${_DCTK_PROG^^}")"
 
-  libexec=$(realpath "$BASH_SOURCE")
-  libexec=$(dirname "$libexec")
-  libexec=$(absolute_path "$libexec"/../libexec)
-  # shellcheck disable=SC2034
-  env[libexec]=$libexec
-
-  # shellcheck disable=SC2034,SC2154
-  messages[no_such_command]='%s: no such command "%s"'
-
-  route :env :messages
+  route command libexec args no_such_command
 }
 
 route() {
-  local params=( command args prog libexec no_such_command )
-  eval "$(instantiate "${#params[@]}" "${params[@]}" "$@")"
+  local params=( command libexec @args no_such_command )
+  eval "$(passed params "$@")"
 
+  local -a roots=( "$libexec" )
   local command_path
 
-  case ${command:-} in
-    "" | "-h" | "--help" )
+  case $command in
+    ''| '-h' | '--help' )
       exec "$libexec"/help
       ;;
     * )
       # shellcheck disable=SC2059,SC2154
-      command_path=$(find_command "$command" "$libexec") || errexit "$(printf "$no_such_command\n" "$prog" "$command")"
+      command_path=$(find_command command roots) || errexit "$no_such_command"
       shift
       # shellcheck disable=SC2086
-      exec "$command_path" $args
+      exec "$command_path" "${args[@]:-}"
       ;;
   esac
 }
 
 find_command() {
-  local params=( command libexec )
-  eval "$(instantiate "${#params[@]}" "${params[@]}" "$@")"
+  # shellcheck disable=SC2034
+  local params=( command @roots )
+  eval "$(passed params "$@")"
 
+  local libexec=${roots[0]}
   local command_path=$libexec/$command
 
   is_executable_file "$command_path" || return
