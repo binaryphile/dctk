@@ -5,7 +5,6 @@
 readonly _dctk_help=loaded
 
 source kzn.bash
-initialize_kzn
 
 defs usage_message <<'EOS'
   Usage: %s <command> [<args>]

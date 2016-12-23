@@ -54,7 +54,7 @@ describe 'find_command'
     result=$(find_command file [0]="$dir")
     assert equal "$dir"/file "$result"
     # shellcheck disable=SC2154
-    $rm "$dir"
+    cleanup "$dir"
     return "$_shpec_failures" )
   end
 
@@ -65,7 +65,7 @@ describe 'find_command'
     find_command file [0]="$dir" >/dev/null
     assert unequal 0 $?
     # shellcheck disable=SC2154
-    $rm "$dir"
+    cleanup "$dir"
     return "$_shpec_failures" )
   end
 
@@ -80,7 +80,7 @@ describe 'find_command'
     result=$(find_command file "[0]=$dir/dir1 [1]=$dir/dir2")
     assert equal "$dir"/dir2/file "$result"
     # shellcheck disable=SC2154
-    $rm "$dir"
+    cleanup "$dir"
     return "$_shpec_failures" )
   end
 end

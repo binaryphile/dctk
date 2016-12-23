@@ -4,7 +4,6 @@
 readonly _dctk_completions=loaded
 
 source kzn.bash
-initialize_kzn
 
 main() {
   local command=${1:-}

@@ -7,7 +7,6 @@
 readonly _dctk_commands=loaded
 
 source kzn.bash
-initialize_kzn
 
 main() {
   local libexec

@@ -4,7 +4,6 @@
 readonly _dctk_init=loaded
 
 source kzn.bash
-initialize_kzn
 
 prog=${_DCTK_PROG:-dctk}
 
