@@ -51,7 +51,7 @@ describe 'find_command'
     dir=$($mktempd) || return 1
     touch "$dir"/file
     chmod +x "$dir"/file
-    result=$(find_command file [0]="$dir")
+    result=$(find_command file dir)
     assert equal "$dir"/file "$result"
     # shellcheck disable=SC2154
     cleanup "$dir"
@@ -62,14 +62,14 @@ describe 'find_command'
     source "$bin"/dctk
     # shellcheck disable=SC2154
     dir=$($mktempd) || return 1
-    find_command file [0]="$dir" >/dev/null
+    find_command file dir
     assert unequal 0 $?
     # shellcheck disable=SC2154
     cleanup "$dir"
     return "$_shpec_failures" )
   end
 
-  it 'finds the first command in a set of directories'; (
+  it 'finds the first command in a non-libexec root'; (
     source "$bin"/dctk
     # shellcheck disable=SC2154
     dir=$($mktempd) || return 1
@@ -77,7 +77,7 @@ describe 'find_command'
     mkdir "$dir"/dir2
     touch "$dir"/dir2/file
     chmod +x "$dir"/dir2/file
-    result=$(find_command file "[0]=$dir/dir1 [1]=$dir/dir2")
+    result=$(find_command file "$dir"/dir1 "$dir"/dir2)
     assert equal "$dir"/dir2/file "$result"
     # shellcheck disable=SC2154
     cleanup "$dir"

@@ -18,7 +18,7 @@ describe 'init'
 EOS
     # shellcheck disable=SC2030,SC2059
     printf -v expected "$expected" "$bin"
-    result=$("$libexec"/init 2>&1)
+    result=$("$libexec"/init 3>&2 2>&1 1>&3)
     # shellcheck disable=SC2016,SC2154
     assert equal "$expected" "$result"
     # shellcheck disable=SC2154

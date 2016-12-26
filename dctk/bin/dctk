@@ -14,7 +14,7 @@ dctk_exports() {
   export _DCTK_PROG
 
   source_path=$(realpath "$BASH_SOURCE")
-  source_path=$(dirname "$source_path")
+  source_path=$(dirname source_path)
   root=$(absolute_path "$source_path"/../..)
   dctk_libexec=$root/dctk/libexec
   prog_root=$root/$_DCTK_PROG
@@ -27,6 +27,7 @@ dctk_main() {
   local command=${1:-}; shift ||:
   local -a args=( "$@" )
   local no_such_command
+  # shellcheck disable=SC2034
   printf -v no_such_command '%s: no such command "%s"\n' "$_DCTK_PROG" "$command"
 
   dctk_route command dctk_libexec prog_root args no_such_command
@@ -44,7 +45,7 @@ dctk_route() {
       ;;
     * )
       # shellcheck disable=SC2059,SC2154
-      command_path=$(find_command command dctk_libexec prog_root) || errexit "$no_such_command"
+      command_path=$(find_command command dctk_libexec prog_root) || errexit no_such_command
       shift
       # shellcheck disable=SC2086
       exec "$command_path" "${args[@]:-}"
@@ -57,10 +58,13 @@ find_command() {
   local params=( command dctk_libexec prog_root )
   eval "$(passed params "$@")"
 
-  local command_path=$dctk_libexec/$command
+  local candidate=$dctk_libexec/$command
 
-  is_executable_file "$command_path" || return
-  puts "$command_path"
+  is_executable_file candidate && { puts candidate; return ;}
+  # shellcheck disable=SC2034
+  candidate=$prog_root/$command
+  is_executable_file candidate && { puts candidate; return ;}
+  return 1
 }
 
 # find_command() {

@@ -14,6 +14,9 @@ defs error_message <<'EOS'
   eval "$(%s/bin/%s init -)"
 EOS
 
+# shellcheck disable=SC2059
+printf -v error_message "$error_message\n" "$prog" '%s' '%s' "$prog"
+
 defs shell_format <<'EOS'
   for file in %q/*.%s; do
     source "$file"
@@ -21,7 +24,7 @@ defs shell_format <<'EOS'
   unset -v file
 EOS
 
-main() {
+init_main() {
   local completions
   local libexec
   local path_format
@@ -35,6 +38,9 @@ main() {
   root=$(absolute_path "$libexec"/../..)
   completions=$root/completions
 
+  # shellcheck disable=SC2059
+  printf -v error_message "$error_message" '%s' "$root"
+
   print=""
   is_same_as - "${1:-}" && { print=1; shift ;}
 
@@ -43,21 +49,23 @@ main() {
 
   ! is_given "$print" && {
     case $shell in
-      "bash" )
+      'bash' )
         # shellcheck disable=SC2088
         profile='~/.bash_profile'
         ;;
-      "zsh" )
+      'zsh' )
         # shellcheck disable=SC2088
         profile='~/.zshenv'
         ;;
       * )
         profile='your profile'
         ;;
-      esac
+    esac
 
+    # shellcheck disable=SC2059
+    printf -v error_message "$error_message" "$profile"
     # shellcheck disable=SC2059,SC2154
-    errexit "$(printf "$error_message\n" "$prog" "$profile" "$root" "$prog")"
+    errexit "$error_message"
   }
 
   # shellcheck disable=SC2016
@@ -76,4 +84,4 @@ main() {
 return 0 2>/dev/null ||:
 
 strict_mode on
-main "$@"
+init_main "$@"
