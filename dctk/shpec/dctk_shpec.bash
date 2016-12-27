@@ -69,6 +69,18 @@ describe 'is_structured'
     return "$_shpec_failures" )
   end
 
+  it 'detects a structured directory with libexec'; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    $mkdir "$dir"/libexec
+    is_structured dir
+    assert equal 0 $?
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
   # it 'finds the command under bin in a non-libexec root'; (
   #   source "$bin"/dctk
   #   # shellcheck disable=SC2154
