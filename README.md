@@ -262,39 +262,6 @@ You should also enable completions for your command with a link:
 
 Add subcommands to the [command] directory and you're good to go.
 
-structured commands
-===================
-
-So far, you've seen simple commands. Subcommands exist simply as
-executables in their command's directory.
-
-However, your commands may require more structure. For example, you may
-have data files which might go in `[command]/share`.
-
-Or you may have a command which is already a project of its own, such as
-an existing [sub][] or a repo you'd like to add as a git submodule.
-
-    .
-    ├── …
-    ├─┬ [command]
-    │ ├── bin             # if bin and/or libexec exist, look there instead for subcommands
-    │ ├── libexec         # for example, when importing an existing project or [sub]
-    │ ├── share           # or to separate out supporting files
-    │ └── other           # whatever you like
-    └── …
-
-If dctk sees a `[command]/bin` and/or `[command]/libexec` directory, it
-will treat the command as structured. A structured command finds its
-subcommands in the `bin` and `libexec` subdirectories instead of the
-main `[command]` directory (with `bin` taking priority in conflicts).
-
-If you ever need to reference files in other subdirectories of your
-structured command, say to access a file in the `[command]/share`
-directory, dctk provides the environment variable `_[COMMAND]_ROOT`. For
-example, if your command is named "rush", then the variable is
-`_RUSH_ROOT`, which expands to `[path to dctk]/rush`. That would make
-the share folder `$_RUSH_ROOT/share`.
-
 why "trapper-keeper"?
 =====================
 
@@ -308,14 +275,14 @@ ambitious, while still as powerful.
 isn't dctk just a rip-off of [sub][]?
 =====================================
 
-dctk is inspired by sub but shares very little code with it, having been
-significantly rewritten. It also sports a number of new features:
+dctk is inspired by sub but shares almost no code, being a ground-up
+rewrite. It also sports numerous additional features:
 
 -   multiple top-level commands in one trapper-keeper
 
--   structured commands
-
 Future:
+
+-   structured commands
 
 -   hierarchical subcommands by nesting directories
 
