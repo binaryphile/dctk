@@ -5,25 +5,36 @@ readonly _dctk_completions=loaded
 
 source kzn.bash
 
-main() {
-  local command=${1:-}
+completions_main() {
+  # shellcheck disable=SC2034
+  local params=( command )
+  eval "$(passed params "$@")"
+
   local command_path
   local libexec
 
-  is_given "$command" || errexit "usage: dctk completions COMMAND [arg1 arg2...]"
+  # shellcheck disable=SC2154
+  is_given command || errexit "usage: dctk completions COMMAND [arg1 arg2...]"
 
   libexec=$(realpath "$BASH_SOURCE")
-  libexec=$(dirname "$libexec")
+  libexec=$(dirname libexec)
+  # shellcheck disable=SC2154
   command_path=$libexec/$command
 
-  { is_script "$command_path" && grep -qi "#"" completions: true" <<<"$(head "$command_path")" ;} || return 0
+  { is_script command_path && grep -qi "#"" completions: true" <<<"$(head "$command_path")" ;} || return 0
   shift
   exec "$command_path" --complete "$@"
 }
 
-is_script() { [[ $(head --bytes=2 "$1") == "#!" ]] ;}
+is_script() {
+  # shellcheck disable=SC2034
+  local params=( path )
+  eval "$(passed params "$@")"
+  # shellcheck disable=SC2154
+  [[ $(head --bytes=2 "$path") == "#!" ]]
+}
 
 return 0 2>/dev/null ||:
 
 strict_mode on
-main "$@"
+completions_main "$@"

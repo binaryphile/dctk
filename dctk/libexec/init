@@ -5,33 +5,35 @@ readonly _dctk_init=loaded
 
 source kzn.bash
 
-prog=${_DCTK_PROG:-dctk}
+init_globals() {
+  defs error_message <<'EOS'
+    # Load %s automatically by adding
+    # the following to %s:
 
-defs error_message <<'EOS'
-  # Load %s automatically by adding
-  # the following to %s:
-
-  eval "$(%s/bin/%s init -)"
+    eval "$(%s/bin/%s init -)"
 EOS
+  # shellcheck disable=SC2059
+  printf -v error_message "$error_message\n" "$_DCTK_PROG" '%s' '%s' "$_DCTK_PROG"
 
-# shellcheck disable=SC2059
-printf -v error_message "$error_message\n" "$prog" '%s' '%s' "$prog"
-
-defs shell_format <<'EOS'
-  for file in %q/*.%s; do
-    source "$file"
-  done
-  unset -v file
+  defs shell_format <<'EOS'
+    for file in %q/*.%s; do
+      source "$file"
+    done
+    unset -v file
 EOS
+}
 
 init_main() {
+  # shellcheck disable=SC2034
+  local params=( option shell )
+  eval "$(passed params "$@")"
+
   local completions
   local libexec
   local path_format
   local print
   local profile
   local root
-  local shell
 
   libexec=$(realpath "$BASH_SOURCE")
   libexec=$(dirname "$libexec")
@@ -42,12 +44,17 @@ init_main() {
   printf -v error_message "$error_message" '%s' "$root"
 
   print=""
-  is_same_as - "${1:-}" && { print=1; shift ;}
+  # shellcheck disable=SC2034
+  if is_same_as - option; then
+    print=1
+  else
+    # shellcheck disable=SC2154
+    shell=$option
+  fi
 
-  shell=${1:-}
-  is_given "$shell" || shell=$(basename "$SHELL")
+  is_given shell || shell=$(basename "$SHELL")
 
-  ! is_given "$print" && {
+  ! is_given print && {
     case $shell in
       'bash' )
         # shellcheck disable=SC2088
@@ -65,7 +72,7 @@ init_main() {
     # shellcheck disable=SC2059
     printf -v error_message "$error_message" "$profile"
     # shellcheck disable=SC2059,SC2154
-    errexit "$error_message"
+    errexit error_message
   }
 
   # shellcheck disable=SC2016
@@ -74,7 +81,7 @@ init_main() {
   printf "$path_format\n" "$root"
 
   case $shell in
-    "bash" | "zsh" )
+    'bash' | 'zsh' )
       # shellcheck disable=SC2059,SC2154
       printf "$shell_format\n" "$completions" "$shell"
       ;;
@@ -84,4 +91,5 @@ init_main() {
 return 0 2>/dev/null ||:
 
 strict_mode on
+init_globals
 init_main "$@"

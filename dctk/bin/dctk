@@ -67,36 +67,6 @@ find_command() {
   return 1
 }
 
-# find_command() {
-#   local candidate
-#   local root
-#
-#   # shellcheck disable=SC2154
-#   for root in "${roots[@]:1}"; do
-#     candidate="$root/$invoked_executable"
-#     executable_file?    "$candidate"  && { command=( "$candidate" "$@" ); return    ;}
-#     nonexecutable_file? "$candidate"  && { command=( "$candidate" );      return 2  ;}
-#   done
-#
-#   # shellcheck disable=SC2154
-#   for root in "${roots[@]}"; do
-#     find_recursive "$root" "$@" && return
-#   done
-# }
-#
-# find_recursive() {
-#   command+=( $2 )
-#   local candidate1=$1/$2
-#   local candidate2=$candidate1/$2
-#   shift 2
-#
-#   nonexecutable_file? "$candidate1" && return 2
-#   nonexecutable_file? "$candidate2" && return 2
-#   executable_file?    "$candidate1" && { command=( $candidate1 "$@" ); return ;}
-#   executable_file?    "$candidate2" && { command=( $candidate2 "$@" ); return ;}
-#   directory?          "$candidate1" && any? "$@" && find_recursive "$candidate1" "$@"
-# }
-
 return 0 2>/dev/null ||:
 
 strict_mode on

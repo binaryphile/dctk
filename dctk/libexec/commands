@@ -8,26 +8,30 @@ readonly _dctk_commands=loaded
 
 source kzn.bash
 
-main() {
+commands_main() {
   local libexec
 
   libexec=$(realpath "$BASH_SOURCE")
-  libexec=$(dirname "$libexec")
+  libexec=$(dirname libexec)
 
-  list_commands "$libexec" | uniq | sort
+  list_commands libexec | uniq | sort
 }
 
 list_commands() {
-  local libexec=$1
+  # shellcheck disable=SC2034
+  local params=( libexec )
+  eval "$(passed params "$@")"
+
   local command
 
   shopt -s nullglob
+  # shellcheck disable=SC2034
   for command in "$libexec"/*; do
-    puts "$(basename "$command")"
+    puts "$(basename command)"
   done
 }
 
 return 0 2>/dev/null ||:
 
 strict_mode on
-main "$@"
+commands_main "$@"

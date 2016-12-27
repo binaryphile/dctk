@@ -26,7 +26,7 @@ EOS
     # shellcheck disable=SC2016
     stub_command grep 'echo "$2"'
     stub_command exec ':'
-    result=$(main help)
+    result=$(completions_main help)
     # shellcheck disable=SC2154
     assert equal "# completions: true" "$result"
     return "$_shpec_failures" )
