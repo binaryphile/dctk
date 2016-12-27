@@ -6,6 +6,8 @@ readonly _dctk_init=loaded
 source kzn.bash
 
 init_globals() {
+  local prog=${_DCTK_PROG:-dctk}
+
   defs error_message <<'EOS'
     # Load %s automatically by adding
     # the following to %s:
@@ -13,7 +15,7 @@ init_globals() {
     eval "$(%s/bin/%s init -)"
 EOS
   # shellcheck disable=SC2059
-  printf -v error_message "$error_message\n" "$_DCTK_PROG" '%s' '%s' "$_DCTK_PROG"
+  printf -v error_message "$error_message\n" "$prog" '%s' '%s' "$prog"
 
   defs shell_format <<'EOS'
     for file in %q/*.%s; do
