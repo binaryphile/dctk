@@ -98,21 +98,47 @@ describe 'is_structured'
   end
 end
 
-describe 'search_root'
-  it 'finds a command in a root dir'; (
+describe 'search_roots'
+  it 'finds a command in a single root dir'; (
     # shellcheck disable=SC2154
     dir=$($mktempd) || return 1
     touch "$dir"/file
     chmod +x "$dir"/file
-    result=$(find_command file dir)
+    result=$(search_roots file "[0]=$dir [1]=myvar")
     assert equal "$dir"/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
+  it 'finds a command in a second root dir'; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    $mkdir "$dir"/dir1
+    $mkdir "$dir"/dir2
+    touch "$dir"/dir2/file
+    chmod +x "$dir"/dir2/file
+    result=$(search_roots file "[0]=$dir/dir1 [1]=$dir/dir2")
+    assert equal "$dir"/dir2/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
+  it "doesn't find a non-existent file"; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    $mkdir "$dir"/dir1
+    $mkdir "$dir"/dir2
+    search_roots file "[0]=$dir/dir1 [1]=$dir/dir2" >/dev/null
+    assert unequal 0 $?
     # shellcheck disable=SC2154
     cleanup "$dir"
     return "$_shpec_failures" )
   end
 end
 
-describe 'structure_search'
+describe 'structured_search'
   it 'finds the command under bin in a structured root'; (
     source "$bin"/dctk
     # shellcheck disable=SC2154
@@ -121,7 +147,7 @@ describe 'structure_search'
     $mkdir "$dir"/bin
     touch "$dir"/bin/file
     chmod +x "$dir"/bin/file
-    result=$(structure_search file dir)
+    result=$(structured_search file dir)
     assert equal "$dir"/bin/file "$result"
     # shellcheck disable=SC2154
     cleanup "$dir"

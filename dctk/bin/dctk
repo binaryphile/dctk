@@ -57,8 +57,9 @@ find_command() {
   local params=( command dctk_libexec prog_root )
   eval "$(passed params "$@")"
 
-  search_root command dctk_libexec && return
-  structure_search command prog_root
+  # shellcheck disable=SC2034
+  result=$(search_roots command [0]="$dctk_libexec") || result=$(structured_search command prog_root) || return
+  puts result
 }
 
 is_structured() {
@@ -70,26 +71,41 @@ is_structured() {
   is_directory "$dir"/bin || is_directory "$dir"/libexec
 }
 
-search_root() {
+search_roots() {
   # shellcheck disable=SC2034
-  local params=( command root )
+  local params=( command @roots )
   eval "$(passed params "$@")"
 
-  # shellcheck disable=SC2034
-  local candidate=$root/$command
+  local candidate
+  local root
 
-  is_executable_file candidate || return
-  puts candidate
+  # shellcheck disable=SC2154
+  for root in "${roots[@]}"; do
+    # shellcheck disable=SC2034
+    candidate=$root/$command
+
+    is_executable_file candidate || continue
+    puts candidate
+    return 0
+  done
+  return 1
 }
 
-structure_search() {
+structured_search() {
   # shellcheck disable=SC2034
   local params=( command root )
   eval "$(passed params "$@")"
 
-  is_structured root || { search_root command root; return ;}
-  search_root command "$root"/bin && return
-  search_root command "$root"/libexec
+  local code
+
+  if is_structured root; then
+    result=$(search_roots command "[0]=$root/bin [1]=$root/libexec") # shellcheck disable=SC2034
+    code=$?
+  else
+    result=$(search_roots command [0]="$root") # shellcheck disable=SC2034
+    code=$?
+  fi
+  ! (( code )) && puts result
 }
 
 return 0 2>/dev/null ||:
