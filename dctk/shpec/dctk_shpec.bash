@@ -56,7 +56,6 @@ describe 'find_command'
   end
 
   it 'finds the command under bin in a non-libexec root'; (
-    source "$bin"/dctk
     # shellcheck disable=SC2154
     dir=$($mktempd) || return 1
     # shellcheck disable=SC2154
@@ -104,7 +103,7 @@ describe 'search_roots'
     dir=$($mktempd) || return 1
     touch "$dir"/file
     chmod +x "$dir"/file
-    result=$(search_roots file "[0]=$dir [1]=myvar")
+    result=$(search_roots file [0]="$dir")
     assert equal "$dir"/file "$result"
     # shellcheck disable=SC2154
     cleanup "$dir"
@@ -139,8 +138,33 @@ describe 'search_roots'
 end
 
 describe 'structured_search'
-  it 'finds the command under bin in a structured root'; (
-    source "$bin"/dctk
+  it 'finds the command in an unstructured root'; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    $mkdir "$dir"
+    touch "$dir"/file
+    chmod +x "$dir"/file
+    result=$(structured_search file dir)
+    assert equal "$dir"/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
+  it "doesn't find a non-existent command in an unstructured root"; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    $mkdir "$dir"
+    structured_search file dir >/dev/null
+    assert unequal 0 $?
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
+  it 'finds the command under bin in a structured root with bin'; (
     # shellcheck disable=SC2154
     dir=$($mktempd) || return 1
     # shellcheck disable=SC2154
@@ -149,6 +173,79 @@ describe 'structured_search'
     chmod +x "$dir"/bin/file
     result=$(structured_search file dir)
     assert equal "$dir"/bin/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
+  it 'finds the command under libexec in a structured root with libexec'; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    $mkdir "$dir"/bin
+    touch "$dir"/bin/file
+    chmod +x "$dir"/bin/file
+    result=$(structured_search file dir)
+    assert equal "$dir"/bin/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
+  it 'finds the command under bin in a structured root with both dirs'; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    $mkdir "$dir"/bin
+    $mkdir "$dir"/libexec
+    touch "$dir"/bin/file
+    chmod +x "$dir"/bin/file
+    result=$(structured_search file dir)
+    assert equal "$dir"/bin/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
+  it 'finds the command under libexec in a structured root with both dirs'; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    $mkdir "$dir"/bin
+    $mkdir "$dir"/libexec
+    touch "$dir"/libexec/file
+    chmod +x "$dir"/libexec/file
+    result=$(structured_search file dir)
+    assert equal "$dir"/libexec/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
+  it 'finds the command under bin in a structured root with both commands'; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    $mkdir "$dir"/bin
+    $mkdir "$dir"/libexec
+    touch "$dir"/bin/file
+    chmod +x "$dir"/bin/file
+    touch "$dir"/libexec/file
+    chmod +x "$dir"/libexec/file
+    result=$(structured_search file dir)
+    assert equal "$dir"/bin/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
+  it "doesn't find a non-existent command in a structured root"; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    $mkdir "$dir"/bin
+    structured_search file dir >/dev/null
+    assert unequal 0 $?
     # shellcheck disable=SC2154
     cleanup "$dir"
     return "$_shpec_failures" )

@@ -26,18 +26,18 @@ dctk_exports() {
 dctk_main() {
   local command=${1:-}; shift ||:
   local -a args=( "$@" )
-  local no_such_command
-  # shellcheck disable=SC2034
-  printf -v no_such_command '%s: no such command "%s"\n' "$_DCTK_PROG" "$command"
 
-  dctk_route command dctk_libexec prog_root args no_such_command
+  dctk_route command dctk_libexec prog_root args
 }
 
 dctk_route() {
-  local params=( command dctk_libexec prog_root @args no_such_command )
+  local params=( command dctk_libexec prog_root @args )
   eval "$(passed params "$@")"
 
   local command_path
+  local no_such_command
+  # shellcheck disable=SC2034
+  printf -v no_such_command '%s: no such command "%s"\n' "$_DCTK_PROG" "$command"
 
   case $command in
     ''| '-h' | '--help' )
