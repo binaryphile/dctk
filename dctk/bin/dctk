@@ -73,15 +73,15 @@ is_structured() {
 
 search_root() {
   # shellcheck disable=SC2034
-  local params=( command root )
+  local params=( root command )
   eval "$(passed params "$@")"
 
-  local candidate
+  local -a result
+  local candidate=$root/$command
 
-  # shellcheck disable=SC2034
-  candidate=$root/$command
   is_executable_file candidate || return
-  puts candidate
+  result=( "$candidate" )
+  pass result
 }
 
 search_roots() {
