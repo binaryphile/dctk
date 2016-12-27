@@ -27,7 +27,7 @@ EOS
 
 init_main() {
   # shellcheck disable=SC2034
-  local params=( option shell )
+  local params=( option='' shell='' )
   eval "$(passed params "$@")"
 
   local completions
@@ -47,7 +47,7 @@ init_main() {
 
   print=""
   # shellcheck disable=SC2034
-  if is_same_as - option; then
+  if is_same_as '-' option; then
     print=1
   else
     # shellcheck disable=SC2154
