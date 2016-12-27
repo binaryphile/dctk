@@ -36,7 +36,7 @@ EOS
     # shellcheck disable=SC2016
     stub_command grep 'echo "$2"'
     stub_command exec ':'
-    result=$(main fake)
+    result=$(completions_main fake)
     # shellcheck disable=SC2154
     assert equal '' "$result"
     # shellcheck disable=SC2154
