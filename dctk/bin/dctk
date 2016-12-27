@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+[[ -n $_dctk ]] && return
+readonly _dctk=loaded
+
+source kzn.bash
+
+dctk_exports() {
+  local prog_root_name
+  local root
+  local source_path
+
+  _DCTK_PROG=$(basename "$BASH_SOURCE")
+  export _DCTK_PROG
+
+  source_path=$(realpath "$BASH_SOURCE")
+  source_path=$(dirname source_path)
+  root=$(absolute_path "$source_path"/../..)
+  dctk_libexec=$root/dctk/libexec
+  prog_root=$root/$_DCTK_PROG
+  prog_root_name=$(printf '_%s_ROOT' "${_DCTK_PROG^^}")
+  printf -v "$prog_root_name" '%s' "$prog_root"
+  export "$prog_root_name"
+}
+
+dctk_main() {
+  local command=${1:-}; shift ||:
+  local -a args=( "$@" )
+  local no_such_command
+  # shellcheck disable=SC2034
+  printf -v no_such_command '%s: no such command "%s"\n' "$_DCTK_PROG" "$command"
+
+  dctk_route command dctk_libexec prog_root args no_such_command
+}
+
+dctk_route() {
+  local params=( command dctk_libexec prog_root @args no_such_command )
+  eval "$(passed params "$@")"
+
+  local command_path
+
+  case $command in
+    ''| '-h' | '--help' )
+      exec "$dctk_libexec"/help
+      ;;
+    * )
+      # shellcheck disable=SC2059,SC2154
+      command_path=$(find_command command dctk_libexec prog_root) || errexit no_such_command
+      shift
+      # shellcheck disable=SC2086
+      exec "$command_path" "${args[@]:-}"
+      ;;
+  esac
+}
+
+find_command() {
+  # shellcheck disable=SC2034
+  local params=( command dctk_libexec prog_root )
+  eval "$(passed params "$@")"
+
+  local candidate=$dctk_libexec/$command
+
+  is_executable_file candidate && { puts candidate; return ;}
+  # shellcheck disable=SC2034
+  candidate=$prog_root/$command
+  is_executable_file candidate && { puts candidate; return ;}
+  return 1
+}
+
+return 0 2>/dev/null ||:
+
+strict_mode on
+dctk_exports
+dctk_main "$@"

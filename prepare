@@ -4,47 +4,42 @@
 readonly _dctk_prepare=loaded
 
 source kzn.bash
-initialize_kzn
+source macros.bash
 
-prog=dctk
+prepare_globals() {
+  prog=dctk
 
-printf -v expression "s/%s/%s/g" "$prog" "%s"
+  defs message <<'EOS'
+    Done! Enjoy your new trapper-keeper! If you're happy with your trapper-keeper,
+    run:
 
-define message <<'EOS'
-Done! Enjoy your new %s! If you're happy with your %s, run:
+        rm -rf .git
+        git init
+        git add .
+        git commit -m 'Starting off %s'
+        ./bin/%s init
 
-    rm -rf .git
-    git init
-    git add .
-    git commit -m 'Starting off %s'
-    ./bin/%s init
+    Made a mistake? Want to make a different trapper-keeper? Run:
 
-Made a mistake? Want to make a different %s? Run:
+        git add .
+        git checkout -f
 
-    git add .
-    git checkout -f
-
-Thanks for making a %s!\n
+    Thanks for making a trapper-keeper!
 EOS
-# shellcheck disable=SC2059
-printf -v message "$message" "$prog" "$prog" "%s" "%s" "$prog" "$prog"
+  printf -v message '%s\n' "$message"
+}
 
-main() {
+prepare_main() {
   local name=${1:-}
   local bin
-  local libexec
-  local file
   local root
-  local sed_expr
-  local share
 
   is_given "$name" || errexit "usage: prepare name_of_your_$prog"
 
   root=$(realpath "$BASH_SOURCE")
   root=$(dirname "$root")
   bin=$root/bin
-  libexec=$root/libexec
-  share=$root/share
+  completions=$root/completions
 
   name=$(to_lower "$name")
 
@@ -57,21 +52,17 @@ main() {
   # shellcheck disable=SC2059,SC2154
   is_same_as "$prog" "$name" && { printf "$message" "$name" "$name"; exit ;}
 
-  mv "$share/$prog" "$share/$name"
-
-  for file in **/"$prog"*; do
-    # shellcheck disable=SC2059
-    printf -v sed_expr "$expression" "$name"
-    sed "$sed_expr" "$file" > "${file/$prog/$name}"
-    $rm "$file"
-  done
-
-  for file in "$libexec"/*; do
-    chmod a+x "$file"
-  done
-
   $rm "$bin/$prog"
-  ln -sf ../libexec/"$name" "$bin/$name"
+  ln -sf ../"$prog"/bin/"$prog" "$bin/$name"
+
+  $rm "$completions/$prog".bash
+  ln -sf ../"$prog"/completions/"$prog".bash "$completions/$name".bash
+
+  $rm "$completions/$prog".zsh
+  ln -sf ../"$prog"/completions/"$prog".zsh "$completions/$name".zsh
+
+  # shellcheck disable=SC2154
+  $mkdir "$root/$name"
 
   # shellcheck disable=SC2059
   printf "$message" "$name" "$name"
@@ -80,4 +71,5 @@ main() {
 return 0 2>/dev/null ||:
 
 strict_mode on
-main "$@"
+prepare_globals
+prepare_main "$@"
