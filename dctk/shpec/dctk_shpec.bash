@@ -54,6 +54,22 @@ describe 'find_command'
     cleanup "$dir"
     return "$_shpec_failures" )
   end
+
+  it 'finds the command under bin in a non-libexec root'; (
+    source "$bin"/dctk
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    $mkdir "$dir"/dir1
+    $mkdir "$dir"/dir2/bin
+    touch "$dir"/dir2/bin/file
+    chmod +x "$dir"/dir2/bin/file
+    result=$(find_command file "$dir"/dir1 "$dir"/dir2)
+    assert equal "$dir"/dir2/bin/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
 end
 
 describe 'is_structured'
@@ -80,22 +96,6 @@ describe 'is_structured'
     cleanup "$dir"
     return "$_shpec_failures" )
   end
-
-  # it 'finds the command under bin in a non-libexec root'; (
-  #   source "$bin"/dctk
-  #   # shellcheck disable=SC2154
-  #   dir=$($mktempd) || return 1
-  #   # shellcheck disable=SC2154
-  #   $mkdir "$dir"/dir1
-  #   $mkdir "$dir"/dir2/bin
-  #   touch "$dir"/dir2/bin/file
-  #   chmod +x "$dir"/dir2/bin/file
-  #   result=$(find_command file "$dir"/dir1 "$dir"/dir2)
-  #   assert equal "$dir"/dir2/bin/file "$result"
-  #   # shellcheck disable=SC2154
-  #   cleanup "$dir"
-  #   return "$_shpec_failures" )
-  # end
 end
 
 describe 'search_root'
@@ -106,6 +106,23 @@ describe 'search_root'
     chmod +x "$dir"/file
     result=$(find_command file dir)
     assert equal "$dir"/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+end
+
+describe 'structure_search'
+  it 'finds the command under bin in a structured root'; (
+    source "$bin"/dctk
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    $mkdir "$dir"/bin
+    touch "$dir"/bin/file
+    chmod +x "$dir"/bin/file
+    result=$(structure_search file dir)
+    assert equal "$dir"/bin/file "$result"
     # shellcheck disable=SC2154
     cleanup "$dir"
     return "$_shpec_failures" )

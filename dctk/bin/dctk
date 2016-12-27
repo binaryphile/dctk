@@ -58,7 +58,7 @@ find_command() {
   eval "$(passed params "$@")"
 
   search_root command dctk_libexec && return
-  search_root command prog_root
+  structure_search command prog_root
 }
 
 is_structured() {
@@ -80,6 +80,16 @@ search_root() {
 
   is_executable_file candidate || return
   puts candidate
+}
+
+structure_search() {
+  # shellcheck disable=SC2034
+  local params=( command root )
+  eval "$(passed params "$@")"
+
+  is_structured root || { search_root command root; return ;}
+  search_root command "$root"/bin && return
+  search_root command "$root"/libexec
 }
 
 return 0 2>/dev/null ||:
