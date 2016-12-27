@@ -16,7 +16,7 @@ describe 'rush help'
       Usage: rush <command> [<args>]
 
       Some useful rush commands are:
-        commands  List all rush commands
+         commands  List all rush commands
 
       See 'rush help <command>' for information on a specific command.
 EOS
