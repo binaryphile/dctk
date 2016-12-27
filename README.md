@@ -1,5 +1,5 @@
-dctk: organize your programs with *[Dawson's Creek Trapper Keeper Ultra Keeper Futura S 2000][]*
-================================================================================================
+dctk: organize your programs with *[Dawson's Creek Trapper Keeper Ultra Keeper Futura S 2000]*
+==============================================================================================
 
 dctk helps you set up your own command or commands, which use separate
 scripts as subcommands. Such subcommands work much like git's or rbenv's
@@ -79,7 +79,7 @@ functionality that makes it your own command.
 prerequisites
 =============
 
-dctk requires the [kaizen][] bash library.
+dctk requires the [kaizen] bash library.
 
 Clone that repo and either add its `lib` to your PATH or put
 `lib/kzn.bash` somewhere already on your PATH.
@@ -268,7 +268,7 @@ You should also enable completions for your command with a link:
     $ cd ../completions
     $ ln -sf ../dctk/completions/dctk.bash [command].bash   # or .zsh, if that's your shell
 
-Add subcommands to the [command] directory and you're good to go.
+Add subcommands to the \[command\] directory and you're good to go.
 
 structured commands
 ===================
@@ -280,7 +280,7 @@ However, your commands may require more structure. For example, you may
 have data files which might go in `[command]/share`.
 
 Or you may have a command which is already a project of its own, such as
-an existing [sub][] or a repo you'd like to add as a git submodule.
+an existing [sub] or a repo you'd like to add as a git submodule.
 
     .
     ├── …
@@ -313,8 +313,8 @@ belongings (as well as Cartman himself). His trapper-keeper ultimately
 became sentient and took over the world. Hopefully yours will be less
 ambitious, while still as powerful.
 
-isn't dctk just a rip-off of [sub][]?
-=====================================
+isn't dctk just a rip-off of [sub]?
+===================================
 
 dctk is inspired by sub but shares almost no code, being a ground-up
 rewrite. It also sports numerous additional features:
@@ -329,7 +329,7 @@ Future:
 
 -   functions as subcommands
 
--   [docopt][] support
+-   [docopt] support
 
 License
 =======
