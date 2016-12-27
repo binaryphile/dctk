@@ -76,6 +76,14 @@ there won't be a `dctk` command after you run the `prepare` script to
 customize it. Your project will contain dctk's bones but will add the
 functionality that makes it your own command.
 
+prerequisites
+=============
+
+dctk requires the [kaizen][] bash library.
+
+Clone that repo and either add its `lib` to your PATH or put
+`lib/kzn.bash` somewhere already on your PATH.
+
 installation
 ============
 
@@ -329,5 +337,6 @@ License
 Apache 2.0. See `LICENSE.md`.
 
   [Dawson's Creek Trapper Keeper Ultra Keeper Futura S 2000]: https://en.wikipedia.org/wiki/Trapper_Keeper_(South_Park)
+  [kaizen]: https://github.com/binaryphile/kaizen
   [sub]: https://github.com/basecamp/sub
   [docopt]: http://docopt.org/
