@@ -24,7 +24,7 @@ EOS
 
 help_main() {
   # shellcheck disable=SC2034
-  local params=( command )
+  local params=( command='' )
   eval "$(passed params "$@")"
 
   local file
