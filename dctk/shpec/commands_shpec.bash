@@ -1,4 +1,4 @@
-source shpec_helper.bash
+source shpec-helper.bash
 initialize_shpec_helper
 
 root=$(realpath "$BASH_SOURCE")

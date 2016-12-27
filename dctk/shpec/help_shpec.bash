@@ -1,4 +1,4 @@
-source shpec_helper.bash
+source shpec-helper.bash
 initialize_shpec_helper
 
 libexec=$(realpath "$BASH_SOURCE")
