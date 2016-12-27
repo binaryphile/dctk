@@ -18,7 +18,7 @@ dctk_exports() {
   root=$(absolute_path "$source_path"/../..)
   dctk_libexec=$root/dctk/libexec
   prog_root=$root/$_DCTK_PROG
-  prog_root_name=$(printf '_%s_ROOT' "${_DCTK_PROG^^}")
+  prog_root_name=$(printf '_%s_ROOT' "$(to_upper _DCTK_PROG)")
   printf -v "$prog_root_name" '%s' "$prog_root"
   export "$prog_root_name"
 }

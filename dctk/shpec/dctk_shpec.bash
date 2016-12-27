@@ -2,7 +2,7 @@ source shpec-helper.bash
 initialize_shpec_helper
 
 root=$(realpath "$BASH_SOURCE")
-root=$(dirname "$root")
+root=$(dirname root)
 root=$(absolute_path "$root"/../..)
 bin=$root/dctk/bin
 
