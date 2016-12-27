@@ -1,6 +1,7 @@
-name=${BASH_SOURCE##*/}
+declare name=${BASH_SOURCE##*/}
 name=${name%.*}
 
+declare func
 read -rd "" func <<'EOS' ||:
 _%s() {
   local command
@@ -24,5 +25,4 @@ eval "$(printf "$func" "$name" "$name" "$name")"
 
 complete -F _"$name" "$name"
 
-unset -v func
-unset -v name
+unset -v func name

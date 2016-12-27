@@ -1,9 +1,10 @@
-name=${(%):-%x}
+declare name=${(%):-%x}
 name=${name##*/}
 name=${name%.*}
 
 compctl -K _"$name" "$name"
 
+declare func
 read -rd "" func <<'EOS' ||:
 _%s() {
   local word
