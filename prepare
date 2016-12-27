@@ -4,7 +4,7 @@
 readonly _dctk_prepare=loaded
 
 source kzn.bash
-initialize_kzn
+source macros.bash
 
 prepare_globals() {
   prog=dctk
