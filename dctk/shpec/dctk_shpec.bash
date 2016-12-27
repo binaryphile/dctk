@@ -97,6 +97,20 @@ describe 'is_structured'
   end
 end
 
+describe 'search_root'
+  it 'finds a command in a root dir'; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    touch "$dir"/file
+    chmod +x "$dir"/file
+    result=$(search_root file dir)
+    assert equal "$dir"/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+end
+
 describe 'search_roots'
   it 'finds a command in a single root dir'; (
     # shellcheck disable=SC2154

@@ -71,21 +71,32 @@ is_structured() {
   is_directory "$dir"/bin || is_directory "$dir"/libexec
 }
 
+search_root() {
+  # shellcheck disable=SC2034
+  local params=( command root )
+  eval "$(passed params "$@")"
+
+  local candidate
+
+  # shellcheck disable=SC2034
+  candidate=$root/$command
+  is_executable_file candidate || return
+  puts candidate
+}
+
 search_roots() {
   # shellcheck disable=SC2034
   local params=( command @roots )
   eval "$(passed params "$@")"
 
-  local candidate
+  local result
   local root
 
   # shellcheck disable=SC2154
   for root in "${roots[@]}"; do
     # shellcheck disable=SC2034
-    candidate=$root/$command
-
-    is_executable_file candidate || continue
-    puts candidate
+    result=$(search_root command root) || continue
+    puts result
     return 0
   done
   return 1
