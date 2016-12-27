@@ -46,7 +46,6 @@ dctk_route() {
     * )
       # shellcheck disable=SC2059,SC2154
       command_path=$(find_command command dctk_libexec prog_root) || errexit no_such_command
-      shift
       # shellcheck disable=SC2086
       exec "$command_path" "${args[@]:-}"
       ;;
@@ -58,13 +57,20 @@ find_command() {
   local params=( command dctk_libexec prog_root )
   eval "$(passed params "$@")"
 
-  local candidate=$dctk_libexec/$command
+  search_root command dctk_libexec && return
+  search_root command prog_root
+}
 
-  is_executable_file candidate && { puts candidate; return ;}
+search_root() {
   # shellcheck disable=SC2034
-  candidate=$prog_root/$command
-  is_executable_file candidate && { puts candidate; return ;}
-  return 1
+  local params=( command root )
+  eval "$(passed params "$@")"
+
+  # shellcheck disable=SC2034
+  local candidate=$root/$command
+
+  is_executable_file candidate || return
+  puts candidate
 }
 
 return 0 2>/dev/null ||:
