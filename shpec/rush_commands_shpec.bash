@@ -1,4 +1,4 @@
-source shpec_helper.bash
+source shpec-helper.bash
 initialize_shpec_helper
 
 root=$(realpath "$BASH_SOURCE")
@@ -23,6 +23,7 @@ EOS
     assert equal "$expected" "$result"
     # shellcheck disable=SC2154
     $rm "$dir"
+    # shellcheck disable=SC2154
     return "$_shpec_failures" )
   end
 

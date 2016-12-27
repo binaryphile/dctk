@@ -1,4 +1,4 @@
-source shpec_helper.bash
+source shpec-helper.bash
 initialize_shpec_helper
 
 root=$(realpath "$BASH_SOURCE")
@@ -16,7 +16,7 @@ describe 'rush'
       Usage: rush <command> [<args>]
 
       Some useful rush commands are:
-        commands  List all rush commands
+         commands  List all rush commands
 
       See 'rush help <command>' for information on a specific command.
 EOS
@@ -25,6 +25,7 @@ EOS
     assert equal "$expected" "$result"
     # shellcheck disable=SC2154
     $rm "$dir"
+    # shellcheck disable=SC2154
     return "$_shpec_failures" )
   end
 
@@ -38,7 +39,7 @@ EOS
       Usage: rush <command> [<args>]
 
       Some useful rush commands are:
-        commands  List all rush commands
+         commands  List all rush commands
 
       See 'rush help <command>' for information on a specific command.
 EOS
