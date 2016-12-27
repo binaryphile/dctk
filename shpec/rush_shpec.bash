@@ -58,6 +58,7 @@ EOS
     cd "$dir"
     "$dir"/prepare rush >/dev/null
     source "$dir"/bin/rush
+    dctk_exports
     assert equal "$dir"/rush "$_RUSH_ROOT"
     # shellcheck disable=SC2154
     $rm "$dir"
