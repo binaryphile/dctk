@@ -62,7 +62,8 @@ describe 'is_structured'
     dir=$($mktempd) || return 1
     # shellcheck disable=SC2154
     $mkdir "$dir"/bin
-    assert equal 0 is_structured dir
+    is_structured dir
+    assert equal 0 $?
     # shellcheck disable=SC2154
     cleanup "$dir"
     return "$_shpec_failures" )

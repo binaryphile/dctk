@@ -61,6 +61,15 @@ find_command() {
   search_root command prog_root
 }
 
+is_structured() {
+  # shellcheck disable=SC2034
+  local params=( dir )
+  eval "$(passed params "$@")"
+
+  # shellcheck disable=SC2154
+  is_directory "$dir"/bin || is_directory "$dir"/libexec
+}
+
 search_root() {
   # shellcheck disable=SC2034
   local params=( command root )
