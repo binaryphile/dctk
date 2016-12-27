@@ -178,6 +178,22 @@ describe 'structured_search'
     return "$_shpec_failures" )
   end
 
+  it 'finds the command under bin in a structured root with a root conflict'; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    # shellcheck disable=SC2154
+    touch "$dir"/file
+    chmod +x "$dir"/file
+    $mkdir "$dir"/bin
+    touch "$dir"/bin/file
+    chmod +x "$dir"/bin/file
+    result=$(structured_search file dir)
+    assert equal "$dir"/bin/file "$result"
+    # shellcheck disable=SC2154
+    cleanup "$dir"
+    return "$_shpec_failures" )
+  end
+
   it 'finds the command under libexec in a structured root with libexec'; (
     # shellcheck disable=SC2154
     dir=$($mktempd) || return 1

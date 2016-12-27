@@ -40,7 +40,7 @@ describe 'rush structured hello command'
     return "$_shpec_failures" )
   end
 
-  it 'finds hello in bin when conflicting'; (
+  it 'finds hello in bin when conflicting libexec'; (
     # shellcheck disable=SC2154
     dir=$($mktempd) || return 1
     cp -r "$root"/* "$dir"
@@ -53,6 +53,25 @@ describe 'rush structured hello command'
     puts "echo nope" >"$dir"/rush/libexec/hello
     chmod +x "$dir"/rush/bin/hello
     chmod +x "$dir"/rush/libexec/hello
+    assert equal hello "$("$dir"/bin/rush hello 2>/dev/null)"
+    # shellcheck disable=SC2154
+    $rm "$dir"
+    # shellcheck disable=SC2154
+    return "$_shpec_failures" )
+  end
+
+  it 'finds hello in bin when conflicting root'; (
+    # shellcheck disable=SC2154
+    dir=$($mktempd) || return 1
+    cp -r "$root"/* "$dir"
+    cd "$dir"
+    "$dir"/prepare rush >/dev/null
+    # shellcheck disable=SC2154
+    puts "echo nope" >"$dir"/rush/hello
+    $mkdir "$dir"/rush/bin
+    puts "echo hello" >"$dir"/rush/bin/hello
+    chmod +x "$dir"/rush/hello
+    chmod +x "$dir"/rush/bin/hello
     assert equal hello "$("$dir"/bin/rush hello 2>/dev/null)"
     # shellcheck disable=SC2154
     $rm "$dir"
