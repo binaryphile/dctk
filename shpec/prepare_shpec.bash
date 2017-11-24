@@ -1,25 +1,32 @@
-source shpec-helper.bash
-initialize_shpec_helper
+export TMPDIR=${TMPDIR:-$HOME/tmp}
+mkdir -p "$TMPDIR"
 
-root=$(realpath "$BASH_SOURCE")
-root=$(dirname "$root")
-root=$(absolute_path "$root"/..)
+set -o nounset
 
-describe 'prepare'
-  it 'outputs a message with no input'; (
+source concorde.bash
+$(bring '
+  cptree
+  dirname
+  mktempd
+  readlink
+  rmtree
+' from concorde.commands)
+
+root=$($dirname "$($readlink "$BASH_SOURCE")")/..
+
+describe prepare
+  it "outputs a message with no input"; ( _shpec_failures=0
     result=$("$root"/prepare 2>&1)
-    assert equal 'usage: prepare name_of_your_dctk' "$result"
-    # shellcheck disable=SC2154
-    return "$_shpec_failures" )
+    assert equal $'\nusage: prepare name_of_your_dctk' "$result"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'outputs a message with an input name'; (
-    # shellcheck disable=SC2154
-    dir=$($mktempd) || return 1
-    cp -r "$root"/* "$dir"
+  it "outputs a message with an input name"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $cptree "$root"/* "$dir"
     cd "$dir"
-    defs expected <<'EOS'
-      Preparing your 'name' dctk!
+    get <<'    EOS'
+      Preparing your 'name' trapper-keeper!
       Done! Enjoy your new trapper-keeper! If you're happy with your trapper-keeper,
       run:
 
@@ -35,82 +42,65 @@ describe 'prepare'
           git checkout -f
 
       Thanks for making a trapper-keeper!
-EOS
+    EOS
+    expected=$'\n'${__// }
     result=$("$dir"/prepare name)
-    # shellcheck disable=SC2154
-    assert equal "$expected" "$result"
-    # shellcheck disable=SC2154
-    $rm "$dir"
-    return "$_shpec_failures" )
+    assert equal "$expected" "${result// }"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'removes prepare'; (
-    # shellcheck disable=SC2154
-    dir=$($mktempd) || return 1
-    cp -r "$root"/* "$dir"
+  it "removes prepare"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $cptree "$root"/* "$dir"
     cd "$dir"
     result=$("$dir"/prepare name)
-    is_file "$dir"/prepare
+    [[ -e "$dir"/prepare ]]
     assert unequal 0 "$?"
-    # shellcheck disable=SC2154
-    $rm "$dir"
-    return "$_shpec_failures" )
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'removes README'; (
-    # shellcheck disable=SC2154
-    dir=$($mktempd) || return 1
-    cp -r "$root"/* "$dir"
+  it "removes README"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $cptree "$root"/* "$dir"
     cd "$dir"
     result=$("$dir"/prepare name)
-    is_file "$dir"/README.md
+    [[ -e "$dir"/README.md ]]
     assert unequal 0 "$?"
-    # shellcheck disable=SC2154
-    $rm "$dir"
-    return "$_shpec_failures" )
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'renames bin/dctk'; (
-    # shellcheck disable=SC2154
-    dir=$($mktempd) || return 1
-    cp -r "$root"/* "$dir"
+  it "renames bin/dctk"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $cptree "$root"/* "$dir"
     cd "$dir"
     result=$("$dir"/prepare name)
-    is_symlink "$dir"/bin/dctk
-    assert unequal 0 "$?"
-    assert equal ../dctk/bin/dctk "$(readlink "$dir"/bin/name)"
-    # shellcheck disable=SC2154
-    $rm "$dir"
-    return "$_shpec_failures" )
+    [[ -h "$dir"/bin/name ]]
+    assert equal '(0) (../dctk/bin/dctk)' "($?) ($(readlink "$dir"/bin/name))"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'renames completions/dctk'; (
-    # shellcheck disable=SC2154
-    dir=$($mktempd) || return 1
-    cp -r "$root"/* "$dir"
+  it "renames completions/dctk"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $cptree "$root"/* "$dir"
     cd "$dir"
     result=$("$dir"/prepare name)
-    is_symlink "$dir"/completions/dctk.bash
-    assert unequal 0 $?
-    is_symlink "$dir"/completions/dctk.zsh
-    assert unequal 0 $?
-    assert equal ../dctk/completions/dctk.bash "$(readlink "$dir"/completions/name.bash)"
-    assert equal ../dctk/completions/dctk.zsh "$(readlink "$dir"/completions/name.zsh)"
-    # shellcheck disable=SC2154
-    $rm "$dir"
-    return "$_shpec_failures" );
+    assert equal '(../dctk/completions/dctk.bash) (../dctk/completions/dctk.zsh)' "($(readlink "$dir"/completions/name.bash)) ($(readlink "$dir"/completions/name.zsh))"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'creates a name directory'; (
-    # shellcheck disable=SC2154
-    dir=$($mktempd) || return 1
-    cp -r "$root"/* "$dir"
+  it "creates a name directory"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $cptree "$root"/* "$dir"
     cd "$dir"
     result=$("$dir"/prepare name)
-    is_directory "$dir/name"
+    [[ -d "$dir/name" ]]
     assert equal 0 $?
-    # shellcheck disable=SC2154
-    $rm "$dir"
-    return "$_shpec_failures" )
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 end

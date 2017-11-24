@@ -1,75 +1,67 @@
 #!/usr/bin/env bash
 
-[[ -n $_dctk_prepare ]] && return
-readonly _dctk_prepare=loaded
+source concorde.bash
 
-source kzn.bash
-source macros.bash
-
-prepare_globals() {
-  prog=dctk
-
-  defs message <<'EOS'
-    Done! Enjoy your new trapper-keeper! If you're happy with your trapper-keeper,
-    run:
-
-        rm -rf .git
-        git init
-        git add .
-        git commit -m 'Starting off %s'
-        ./bin/%s init
-
-    Made a mistake? Want to make a different trapper-keeper? Run:
-
-        git add .
-        git checkout -f
-
-    Thanks for making a trapper-keeper!
+get <<'EOS'
+  usage: prepare name_of_your_dctk
 EOS
-  printf -v message '%s\n' "$message"
-}
+printf -v usage '%s\n' "$__"
 
-prepare_main() {
-  local name=${1:-}
+concorde::get_raw <<'EOS'
+  Done! Enjoy your new trapper-keeper! If you're happy with your trapper-keeper,
+  run:
+
+      rm -rf .git
+      git init
+      git add .
+      git commit -m 'Starting off %s'
+      ./bin/%s init
+
+  Made a mistake? Want to make a different trapper-keeper? Run:
+
+      git add .
+      git checkout -f
+
+  Thanks for making a trapper-keeper!
+EOS
+printf -v message '%s\n' "$__"
+
+prepa_main() {
+  local name=${1,,}
   local bin
+  local completions
   local root
 
-  is_given "$name" || errexit "usage: prepare name_of_your_$prog"
-
-  root=$(realpath "$BASH_SOURCE")
-  root=$(dirname "$root")
+  $(bring '
+    dirname
+    ln
+    mkdir
+    readlink
+    rm
+  ' from concorde.commands)
+  root=$($dirname "$($readlink "$BASH_SOURCE")")
   bin=$root/bin
   completions=$root/completions
 
-  name=$(to_lower "$name")
+  put "Preparing your '$name' trapper-keeper!"
 
-  printf "Preparing your '%s' %s!\n" "$name" "$prog"
+  find "$root" -maxdepth 1 -type f -print0 | xargs -0 rm
+  $rm "$bin"/dctk
+  $ln ../dctk/bin/dctk "$bin/$name"
 
-  # shellcheck disable=SC2154
-  $rm "$root"/README.md
-  $rm "$root"/prepare
+  $rm "$completions"/dctk.bash
+  $ln ../dctk/completions/dctk.bash "$completions/$name".bash
 
-  # shellcheck disable=SC2059,SC2154
-  is_same_as "$prog" "$name" && { printf "$message" "$name" "$name"; exit ;}
+  $rm "$completions"/dctk.zsh
+  $ln ../dctk/completions/dctk.zsh "$completions/$name".zsh
 
-  $rm "$bin/$prog"
-  ln -sf ../"$prog"/bin/"$prog" "$bin/$name"
-
-  $rm "$completions/$prog".bash
-  ln -sf ../"$prog"/completions/"$prog".bash "$completions/$name".bash
-
-  $rm "$completions/$prog".zsh
-  ln -sf ../"$prog"/completions/"$prog".zsh "$completions/$name".zsh
-
-  # shellcheck disable=SC2154
   $mkdir "$root/$name"
-
-  # shellcheck disable=SC2059
   printf "$message" "$name" "$name"
 }
 
-return 0 2>/dev/null ||:
-
+sourced && return
 strict_mode on
-prepare_globals
-prepare_main "$@"
+
+put
+(( $# )) || die "$usage" 0
+prepa_main "$@"
