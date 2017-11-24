@@ -50,24 +50,13 @@ describe prepare
     return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it "removes prepare"; ( _shpec_failures=0
+  it "removes top-level files"; ( _shpec_failures=0
     dir=$($mktempd) || return
     $cptree "$root"/* "$dir"
     cd "$dir"
-    result=$("$dir"/prepare name)
-    [[ -e "$dir"/prepare ]]
-    assert unequal 0 "$?"
-    $rmtree "$dir"
-    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
-  end
-
-  it "removes README"; ( _shpec_failures=0
-    dir=$($mktempd) || return
-    $cptree "$root"/* "$dir"
-    cd "$dir"
-    result=$("$dir"/prepare name)
-    [[ -e "$dir"/README.md ]]
-    assert unequal 0 "$?"
+    "$dir"/prepare name >/dev/null 2>&1
+    result=$(find "$dir" -maxdepth 1 -type f -print)
+    assert equal '' "$result"
     $rmtree "$dir"
     return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
