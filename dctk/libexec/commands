@@ -3,35 +3,28 @@
 # Summary: List all %s commands
 # Help: This command is mostly used for autocompletion in various shells, and for `%s help`.
 
-[[ -n $_dctk_commands ]] && return
-readonly _dctk_commands=loaded
+source kaizen.bash globals='array bring glob module sourced strict_mode trim_to_last'
 
-source kzn.bash
-
-commands_main() {
+main () {
   local libexec
 
-  libexec=$(realpath "$BASH_SOURCE")
-  libexec=$(dirname libexec)
-
-  list_commands libexec | uniq | sort
+  libexec=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
+  list_commands "$libexec" | uniq | sort
 }
 
 list_commands() {
-  # shellcheck disable=SC2034
-  local params=( libexec )
-  eval "$(passed params "$@")"
-
+  local libexec=$1
   local command
 
   shopt -s nullglob
-  # shellcheck disable=SC2034
-  for command in "$libexec"/*; do
-    puts "$(basename command)"
+  $glob "$libexec"/*
+  $($array commands="$__")
+  for command in "${commands[@]}"; do
+    $trim_to_last / "$command"
+    echo "$__"
   done
 }
 
-return 0 2>/dev/null ||:
-
-strict_mode on
-commands_main "$@"
+$sourced? && return
+$strict_mode on
+main "$@"

@@ -1,40 +1,30 @@
-source shpec-helper.bash
-initialize_shpec_helper
+set -o nounset
 
-root=$(realpath "$BASH_SOURCE")
-root=$(dirname root)
-root=$(absolute_path "$root"/../..)
-libexec=$root/dctk/libexec
+source concorde.bash globals=get
+libexec=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")/../libexec
 
-describe 'commands'
-  it 'outputs a message with no input'; (
-    defs expected <<'EOS'
+describe commands
+  it "outputs a message with no input"; ( _shpec_failures=0
+    result=$("$libexec"/commands)
+    $get expected <<'    EOS'
       commands
       completions
       help
       init
-EOS
-
-    result=$("$libexec"/commands)
-    # shellcheck disable=SC2154
-    assert equal "$expected" "$result"
-
-    # shellcheck disable=SC2154
-    return "$_shpec_failures" )
+    EOS
+    assert equal "$__" "$result"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'outputs a message with input help'; (
-    defs expected <<'EOS'
+  it "outputs a message with input help"; ( _shpec_failures=0
+    $get <<'    EOS'
       commands
       completions
       help
       init
-EOS
-
+    EOS
     result=$("$libexec"/commands help)
-    # shellcheck disable=SC2154
-    assert equal "$expected" "$result"
-
-    return "$_shpec_failures" )
+    assert equal "$__" "$result"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 end
