@@ -63,5 +63,5 @@ sourced && return
 strict_mode on
 
 put
-(( $# )) || die "$usage" 0
+(( ! $# )) && die "$usage"
 prepa_main "$@"
