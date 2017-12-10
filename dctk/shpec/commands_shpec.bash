@@ -1,12 +1,12 @@
 set -o nounset
 
-source concorde.bash globals=get
+source concorde.bash imports=get
 libexec=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")/../libexec
 
 describe commands
   it "outputs a message with no input"; ( _shpec_failures=0
     result=$("$libexec"/commands)
-    $get expected <<'    EOS'
+    get <<'    EOS'
       commands
       completions
       help
@@ -17,7 +17,7 @@ describe commands
   end
 
   it "outputs a message with input help"; ( _shpec_failures=0
-    $get <<'    EOS'
+    get <<'    EOS'
       commands
       completions
       help

@@ -1,54 +1,165 @@
-source shpec-helper.bash
-initialize_shpec_helper
+export TMPDIR=${TMPDIR:-$HOME/tmp}
+mkdir -p -- "$TMPDIR"
 
-libexec=$(realpath "$BASH_SOURCE")
-libexec=$(dirname libexec)
-libexec=$(absolute_path "$libexec"/../libexec)
+set -o nounset
 
-describe 'help'
-  it 'outputs a message with no input'; (
-    defs expected <<'EOS'
+source kaizen.bash imports='bring get'
+$(bring '
+  dirname
+  echo
+  mktempd
+  readlink
+  rmtree
+  touch
+' from kaizen.commands)
+
+libexec=$($dirname "$($readlink "$BASH_SOURCE")")/../libexec
+source "$libexec"/help
+
+describe help
+  it "outputs a message with no input"; ( _shpec_failures=0
+    get <<'    EOS'
       Usage: dctk <command> [<args>]
 
       Some useful dctk commands are:
-         commands  List all dctk commands
+        commands  List all dctk commands
 
       See 'dctk help <command>' for information on a specific command.
-EOS
+    EOS
     result=$("$libexec"/help)
-    # shellcheck disable=SC2154
-    assert equal "${expected}" "${result%}"
-    # shellcheck disable=SC2154
-    return "$_shpec_failures" )
+    assert equal "$__" "${result#$'\n'}"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'outputs a message for commands'; (
-    defs expected <<'EOS'
+  it "outputs a message for commands"; ( _shpec_failures=0
+    result=$("$libexec"/help commands)
+    get <<'    EOS'
       Usage: dctk commands
 
       This command is mostly used for autocompletion in various shells, and for `dctk help`.
-EOS
-    result=$("$libexec"/help commands)
-    # shellcheck disable=SC2154
-    assert equal "$expected" "$result"
-    return "$_shpec_failures" )
+    EOS
+    assert equal "$__" "${result#$'\n'}"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'outputs a message for completions'; (
+  it "outputs a message for completions"; ( _shpec_failures=0
     result=$("$libexec"/help completions)
-    assert equal "Sorry, this command isn't documented yet." "$result"
-    return "$_shpec_failures" )
+    assert equal "Sorry, this command is not documented yet." "${result#$'\n'}"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'outputs a message for help'; (
+  it "outputs a message for help"; ( _shpec_failures=0
     result=$("$libexec"/help help)
-    assert equal "Sorry, this command isn't documented yet." "$result"
-    return "$_shpec_failures" )
+    assert equal "Sorry, this command is not documented yet." "${result#$'\n'}"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 
-  it 'outputs a message for init'; (
+  it "outputs a message for init"; ( _shpec_failures=0
     result=$("$libexec"/help init)
-    assert equal "Sorry, this command isn't documented yet." "$result"
-    return "$_shpec_failures" )
+    assert equal "Sorry, this command is not documented yet." "${result#$'\n'}"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
+  end
+end
+
+describe command_path
+  it "reports the path of a program"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    touch "$dir"/sample
+    chmod +x "$dir"/sample
+    command_path "$dir" sample
+    assert equal "$dir"/sample "$__"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
+  end
+
+  it "reports the path of a program with a sh- prefix"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    touch "$dir"/sh-sample
+    chmod +x "$dir"/sh-sample
+    command_path "$dir" sample
+    assert equal "$dir"/sh-sample "$__"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
+  end
+
+  it "reports the path of a program when there's also a sh- prefix"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    touch "$dir"/sample
+    chmod +x "$dir"/sample
+    touch "$dir"/sh-sample
+    chmod +x "$dir"/sh-sample
+    command_path "$dir" sample
+    assert equal "$dir"/sample "$__"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
+  end
+end
+
+describe help
+  it "returns help"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $echo "# Help: sample" >"$dir"/sample.txt
+    help "$dir"/sample.txt
+    assert equal sample "$__"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
+  end
+
+  it "returns multline help"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $echo $'# Help: sample\n# another line' >"$dir"/sample.txt
+    help "$dir"/sample.txt
+    assert equal $'sample\nanother line' "$__"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
+  end
+
+  it "returns blank when no help"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $touch "$dir"/sample.txt
+    help "$dir"/sample.txt
+    assert equal '' "$__"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
+  end
+end
+
+describe summary
+  it "returns a summary"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $echo "# Summary: sample" >"$dir"/sample.txt
+    summary "$dir"/sample.txt
+    assert equal sample "$__"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
+  end
+
+  it "returns blank if no summary"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $touch "$dir"/sample.txt
+    summary "$dir"/sample.txt
+    assert equal '' "$__"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
+  end
+end
+
+describe usage
+  it "returns usage"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $echo "# Usage: sample" >"$dir"/sample.txt
+    usage "$dir"/sample.txt
+    assert equal "Usage: sample" "$__"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
+  end
+
+  it "says if usage is not found"; ( _shpec_failures=0
+    dir=$($mktempd) || return
+    $echo >"$dir"/sample.txt
+    usage "$dir"/sample.txt
+    assert equal "Sorry, this command is not documented yet." "$__"
+    $rmtree "$dir"
+    return "$_shpec_failures" );: $(( _shpec_failures += $? ))
   end
 end

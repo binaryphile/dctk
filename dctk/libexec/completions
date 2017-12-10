@@ -1,40 +1,24 @@
 #!/usr/bin/env bash
 
-[[ -n $_dctk_completions ]] && return
-readonly _dctk_completions=loaded
+source kaizen.bash all=1
+$($bring 'dirname readlink' from kaizen.commands)
 
-source kzn.bash
+usage=$'usage: dctk completions COMMAND [arg1 arg2...]\n'
 
-completions_main() {
-  # shellcheck disable=SC2034
-  local params=( command )
-  eval "$(passed params "$@")"
+main () {
+  command=$($dirname "$($readlink "$BASH_SOURCE")")/$1
 
-  local command_path
-  local libexec
-
-  # shellcheck disable=SC2154
-  is_given command || errexit "usage: dctk completions COMMAND [arg1 arg2...]"
-
-  libexec=$(realpath "$BASH_SOURCE")
-  libexec=$(dirname libexec)
-  # shellcheck disable=SC2154
-  command_path=$libexec/$command
-
-  { is_script command_path && grep -qi "#"" completions: true" <<<"$(head "$command_path")" ;} || return 0
+  ! { script? "$command" && grep -qi "[#] completions: true" <<<"$(head "$command")" ;} && return
   shift
-  exec "$command_path" --complete "$@"
+  exec "$command" --complete "$@"
 }
 
-is_script() {
-  # shellcheck disable=SC2034
-  local params=( path )
-  eval "$(passed params "$@")"
-  # shellcheck disable=SC2154
-  [[ $(head --bytes=2 "$path") == "#!" ]]
+script? () {
+  [[ $(head --bytes=2 "$1") == "#!" ]]
 }
 
-return 0 2>/dev/null ||:
-
-strict_mode on
-completions_main "$@"
+$sourced? && return
+$strict_mode on
+echo
+(( ! $# )) && $die "$usage"
+main "$@"

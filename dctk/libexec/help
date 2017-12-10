@@ -1,158 +1,110 @@
 #!/usr/bin/env bash
 # Completions: true
 
-[[ -n $_dctk_help ]] && return
-readonly _dctk_help=loaded
+source kaizen.bash
+$(bring '
+  dirname
+  echo
+  readlink
+' from kaizen.commands)
 
-source kzn.bash
+prog=${_DCTK_PROG:-dctk}
+libexec=$($dirname "$($readlink "$BASH_SOURCE")")
 
-help_globals() {
-  prog=${_DCTK_PROG:-dctk}
+get <<'EOS'
+  Usage: %s <command> [<args>]
 
-  defs usage_message <<'EOS'
-    Usage: %s <command> [<args>]
-
-    Some useful %s commands are:
-    %s
-
-    See '%s help <command>' for information on a specific command.\n
+  Some useful %s commands are:
+    %%s
+  See '%s help <command>' for information on a specific command.\n
 EOS
-  # shellcheck disable=SC2059
-  printf -v usage_message "$usage_message\n" "$prog" "$prog" '%s' "$prog"
-  printf -v error_message '%s: no such command %s%s%s\n' "$prog" \' '%s' \'
+printf -v usage "$__" "$prog" "$prog" "$prog"
+
+main () {
+  $(grab complete_flag from "$1"); shift
+  local path
+
+  (( complete_flag  ))          && exec "$libexec"/commands
+  (( $#             ))          || $die "$usage"
+  command_path "$libexec" "$1"  || $die
+  path=$__
+  usage "$path"
+  $echo "$__"
+  help "$path"
+  given? "$__" && $echo $'\n'"$__";:
 }
 
-help_main() {
-  # shellcheck disable=SC2034
-  local params=( command='' )
-  eval "$(passed params "$@")"
-
-  local file
-  local libexec
-
-  libexec=$(realpath "$BASH_SOURCE")
-  libexec=$(dirname libexec)
-
-  is_same_as --complete command && exec "$libexec"/commands
-
-  case $command in
-    '' )
-      # shellcheck disable=SC2059,SC2154
-      printf "$usage_message" "$(print_summaries libexec)"
-      ;;
-    * )
-      file=$(command_path command libexec)
-      # shellcheck disable=SC2059
-      is_given file || errexit "$(printf "$error_message" "$command")"
-      print_help file
-      ;;
-  esac
+command_path () {
+  __=$(command -v "$1/$2") || __=$(command -v "$1"/sh-"$2") || $(raise CommandNotFoundError "$prog:  no such command '$2'")
 }
 
-command_path() {
-  # shellcheck disable=SC2034
-  local params=( command libexec )
-  eval "$(passed params "$@")"
-
-  command -v "$libexec/$command" || command -v "$libexec"/sh-"$command" ||:
+help () {
+  __=$(awk '/^[^#]/{p=0} /^# Help:/{p=1} p' "$1" | sed "s/^# Help: //;s/^# //;s/^#//")
+  given? "$__" && printf -v __ "$__" "$prog"
 }
 
-help() {
-  # shellcheck disable=SC2034
-  local params=( path )
-  eval "$(passed params "$@")"
-  # shellcheck disable=SC2059,SC2154
-  printf "$(awk '/^[^#]/{p=0} /^# Help:/{p=1} p' "$path" | sed "s/^# Help: //;s/^# //;s/^#//")" "$prog"
-}
-
-print_help() {
-  # shellcheck disable=SC2034
-  local params=( file )
-  eval "$(passed params "$@")"
-
-  local help
-  local usage
-
-  # shellcheck disable=SC2034
-  usage=$(usage file)
-  is_given usage || { puts "Sorry, this command isn't documented yet."; return 0 ;}
-  puts usage
-  help=$(help file)
-  is_given help && printf "\n%s\n" "$help"
-  return 0
-}
-
-print_summaries() {
-  # shellcheck disable=SC2034
-  local params=( libexec )
-  eval "$(passed params "$@")"
-
-  local -a commands
-  local -a summaries
+summaries () {
   local columns
   local command
+  local command_ary=()
   local file
   local format
   local index
+  local libexec=$1
   local longest_command=0
-  local summary
+  local result_ary=()
+  local summary_ary=()
   local summary_length
 
   columns=$(tput cols)
-
   for command in $("$libexec"/commands); do
-    # shellcheck disable=SC2034
-    file=$(command_path command libexec)
-    ! is_symlink file || continue
-    summary=$(summary file)
-    is_given summary || continue
-    commands+=( "$command" )
-    summaries+=( "$summary" )
+    command_path "$libexec" "$command"
+    file=$__
+    ! symlink? "$file" || continue
+    summary "$file"
+    given? "$__" || continue
+    summary_ary+=( "$__" )
+    command_ary+=( "$command" )
     longest_command=$(( ${#command} > longest_command ? ${#command} : longest_command ))
   done
-
-  # shellcheck disable=SC2034
   summary_length=$(( columns - longest_command - 5 ))
-
-  for index in "${!commands[@]}"; do
-    printf -v format "   %%-%ss  %%s\n" "$longest_command"
-    # shellcheck disable=SC2059
-    printf "$format" "${commands[$index]}" \
-      "$(truncate summary_length "${summaries[$index]}")"
+  for index in "${!command_ary[@]}"; do
+    printf -v format "%%-%ss  %%s\n" "$longest_command"
+    truncate summary_length "${summary_ary[index]}"
+    printf -v __ "$format" "${command_ary[index]}" "$__"
   done
 }
 
-# shellcheck disable=SC2059
-summary() {
-  # shellcheck disable=SC2034
-  local params=( path )
-  eval "$(passed params "$@")"
-  printf "$(sed -n -e "s/^# Summary: \(.*\)/\1/p" "$path")" "$prog"
+summary () {
+  __=$(sed -n -e "s/^# Summary: \(.*\)/\1/p" "$1")
+  given? "$__" && printf -v __ "$__" "$prog";:
 }
 
-truncate() {
-  # shellcheck disable=SC2034
-  local params=( max_length string )
-  eval "$(passed params "$@")"
-
+truncate () {
+  local max_length=$1
+  local string=$2
   local length
 
-  # shellcheck disable=SC2154
-  (( ${#string} > max_length )) || { puts string; return ;}
+  (( ${#string} > max_length )) || { __=$string; return ;}
   length=$(( max_length - 3 ))
-  puts "${string:0:$length}..."
+  __=${string:0:$length}...
 }
 
-usage() {
-  # shellcheck disable=SC2034
-  local params=( path )
-  eval "$(passed params "$@")"
-  # shellcheck disable=SC2059
-  printf "$(sed -n "s/^# \(Usage: .*\)/\1/p" "$path")" "$prog"
+usage () {
+  __=$(sed -n "s/^# \(Usage: .*\)/\1/p" "$1")
+  given? "$__" && printf -v __ "$__" "$prog" || __="Sorry, this command is not documented yet."
 }
 
-return 0 2>/dev/null ||:
-
+sourced? && return
 strict_mode on
-help_globals
-help_main "$@"
+
+summaries "$libexec"
+printf -v usage "$usage" "$__"
+
+$echo
+(( ! $# )) && die "$usage"
+get <<'EOS'
+  ''  --complete  ''  "completions"
+EOS
+$(parse_options "$__" "$@") || $die "$usage"
+main "$__" "$@"             || $die "$usage"
