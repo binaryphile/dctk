@@ -1,97 +1,62 @@
 #!/usr/bin/env bash
 
-[[ -n $_dctk_init ]] && return
-readonly _dctk_init=loaded
+source kaizen.bash
+$(bring '
+  basename
+  dirname
+' from kaizen.commands)
 
-source kzn.bash
+prog=${_DCTK_PROG:-dctk}
+__=$($dirname "$BASH_SOURCE")
+absolute_path "$__"/../..
+root=$__
+completions=$root/completions
 
-init_globals() {
-  local prog=${_DCTK_PROG:-dctk}
+get <<'EOS'
+  # Load %s automatically by adding
+  # the following to %%s:
 
-  defs error_message <<'EOS'
-    # Load %s automatically by adding
-    # the following to %s:
-
-    eval "$(%s/bin/%s init -)"
+  eval "$(%s/bin/%s init -)"\n
 EOS
-  # shellcheck disable=SC2059
-  printf -v error_message "$error_message\n" "$prog" '%s' '%s' "$prog"
+printf -v error_message "$__" "$prog" "$root" "$prog"
 
-  defs shell_format <<'EOS'
-    for file in %q/*.%s; do
-      source "$file"
-    done
-    unset -v file
+get <<'EOS'
+  for file in %q/*.%s; do
+    source "$file"
+  done
+  unset -v file\n
 EOS
-}
+shell_format=$__
 
-init_main() {
-  # shellcheck disable=SC2034
-  local params=( option='' shell='' )
-  eval "$(passed params "$@")"
-
-  local completions
-  local libexec
-  local path_format
-  local print
+main () {
+  local arg=${1:-}
   local profile
-  local root
+  local shell
 
-  libexec=$(realpath "$BASH_SOURCE")
-  libexec=$(dirname "$libexec")
-  root=$(absolute_path "$libexec"/../..)
-  completions=$root/completions
-
-  # shellcheck disable=SC2059
-  printf -v error_message "$error_message" '%s' "$root"
-
-  print=""
-  # shellcheck disable=SC2034
-  if is_same_as '-' option; then
-    print=1
-  else
-    # shellcheck disable=SC2154
-    shell=$option
-  fi
-
-  is_given shell || shell=$(basename "$SHELL")
-
-  ! is_given print && {
-    case $shell in
-      'bash' )
-        # shellcheck disable=SC2088
-        profile='~/.bash_profile'
-        ;;
-      'zsh' )
-        # shellcheck disable=SC2088
-        profile='~/.zshenv'
-        ;;
-      * )
-        profile='your profile'
-        ;;
-    esac
-
-    # shellcheck disable=SC2059
-    printf -v error_message "$error_message" "$profile"
-    # shellcheck disable=SC2059,SC2154
-    errexit error_message
-  }
-
-  # shellcheck disable=SC2016
-  path_format='export PATH=$PATH:%q/bin'
-  # shellcheck disable=SC2059,SC2154
-  printf "$path_format\n" "$root"
+  case $arg in
+    -|''  ) shell=$($basename "$SHELL") ;;
+    *     ) shell=$arg                  ;;
+  esac
 
   case $shell in
-    'bash' | 'zsh' )
-      # shellcheck disable=SC2059,SC2154
-      printf "$shell_format\n" "$completions" "$shell"
-      ;;
+    bash  ) profile='~/.bash_profile' ;;
+    zsh   ) profile='~/.zshenv'       ;;
+    *     ) profile='your profile'    ;;
+  esac
+
+  [[ $arg != - ]] && {
+    printf -v __ "$error_message" "$profile"
+    die "$__" rc=1
+  }
+
+  printf 'export PATH+=:%q/bin\n' "$root"
+  case $shell in
+    bash|zsh ) printf "$shell_format" "$completions" "$shell";;
   esac
 }
 
-return 0 2>/dev/null ||:
-
+sourced? && return
 strict_mode on
-init_globals
-init_main "$@"
+echo
+
+main "$@"
