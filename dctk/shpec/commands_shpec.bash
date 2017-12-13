@@ -1,7 +1,8 @@
 set -o nounset
 
-source concorde.bash imports=get
-libexec=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")/../libexec
+source kaizen.bash imports='absolute_dirname get'
+absolute_dirname "$BASH_SOURCE"
+libexec=$__/../libexec
 
 describe commands
   it "outputs a message with no input"; ( _shpec_failures=0
