@@ -1,24 +1,32 @@
 #!/usr/bin/env bash
 
-source kaizen.bash all=1
-$($bring 'dirname readlink' from kaizen.commands)
+source kaizen.bash
+$(bring head from kaizen.commands)
 
 usage=$'usage: dctk completions COMMAND [arg1 arg2...]\n'
 
 main () {
-  command=$($dirname "$($readlink "$BASH_SOURCE")")/$1
+  local command
 
-  ! { script? "$command" && grep -qi "[#] completions: true" <<<"$(head "$command")" ;} && return
+  absolute_dirname "$BASH_SOURCE"
+  command=$__/$1
+
+  ! completions? "$command" && return
   shift
   exec "$command" --complete "$@"
 }
 
-script? () {
-  [[ $(head --bytes=2 "$1") == "#!" ]]
+completions? () {
+  script? "$1" || return
+  $head "$1" | grep -qi "[#] completions: true"
 }
 
-$sourced? && return
-$strict_mode on
-echo
-(( ! $# )) && $die "$usage"
+script? () {
+  [[ $(head --bytes=2 -- "$1") == "#!" ]]
+}
+
+sourced? && return
+strict_mode on
+
+(( ! $# )) && die "$usage"
 main "$@"

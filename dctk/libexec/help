@@ -28,6 +28,7 @@ main () {
   (( $#             ))          || $die "$usage"
   command_path "$libexec" "$1"  || $die
   path=$__
+  $echo
   usage "$path"
   $echo "$__"
   help "$path"
@@ -101,7 +102,6 @@ strict_mode on
 summaries "$libexec"
 printf -v usage "$usage" "$__"
 
-$echo
 (( ! $# )) && die "$usage"
 get <<'EOS'
   ''  --complete  ''  "completions"
