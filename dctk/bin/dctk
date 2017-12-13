@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
-source kaizen.bash all=1
+source kaizen.bash
+$(bring basename from kaizen.commands)
 
-$($module dctk)
+$(module dctk)
 
-$trim_to_last / "$BASH_SOURCE"
-export DCTK_PROG=$__
+export DCTK_PROG=$($basename "$BASH_SOURCE")
 
 main () {
-  $($grabkw help_flag from "$1"); shift
-  local command=$1              ; shift
-  $($bring root)
+  $(grabkw help_flag from "$1"); shift
+  local command=$1             ; shift
+  $(bring root)
 
   (( help_flag )) && exec "$root"/libexec/help
   find_command "$command"
@@ -22,11 +22,11 @@ find_command() {
   local libexec=$1; shift
 
   search_roots "$command" "$libexec" && return
-  (( $# )) && structured_search "$command" "$@" || $($raise CommandNotFoundError errmsg="no such command '$command'")
+  (( $# )) && structured_search "$command" "$@" || $(raise CommandNotFoundError errmsg="no such command '$command'")
 }
 
 structured? () {
-  $directory? "$1"/bin || $directory? "$1"/libexec
+  directory? "$1"/bin || directory? "$1"/libexec
 }
 
 search_roots() {
@@ -34,7 +34,7 @@ search_roots() {
   local root
 
   for root in "$@"; do
-    $executable_file? "$root/$command" || continue
+    executable_file? "$root/$command" || continue
     __=$root/$command
     return
   done
@@ -52,11 +52,11 @@ structured_search() {
   esac
 }
 
-$sourced? && return
-$strict_mode on
+sourced? && return
+strict_mode on
 
-$get <<'EOS'
+get <<'EOS'
   ''   --help   ''   "ask for help"
 EOS
-$($parse_options "$__" "$@")  || $die "$usage"
-main "$__" "$@"               || $die "$usage"
+$(parse_options "$__" "$@") || die "$usage"
+main "$__" "$@"             || die "$usage"
