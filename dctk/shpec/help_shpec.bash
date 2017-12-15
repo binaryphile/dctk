@@ -3,17 +3,20 @@ mkdir -p -- "$TMPDIR"
 
 set -o nounset
 
-source kaizen.bash imports='bring get'
+source kaizen.bash imports='
+  absolute_dirname
+  bring
+  get
+'
 $(bring '
-  dirname
   echo
   mktempd
-  readlink
   rmtree
   touch
 ' from kaizen.commands)
 
-libexec=$($dirname "$($readlink "$BASH_SOURCE")")/../libexec
+absolute_dirname "$BASH_SOURCE"
+libexec=$__/../libexec
 source "$libexec"/help
 
 describe help

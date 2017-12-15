@@ -1,37 +1,34 @@
-source shpec-helper.bash
-initialize_shpec_helper
+set -o nounset
 
-root=$(realpath "$BASH_SOURCE")
-root=$(dirname root)
-root=$(absolute_path "$root"/../..)
-bin=$root/dctk/bin
+source kaizen.bash imports='absolute_dirname get'
 
-describe 'dctk command'
-  it 'outputs a message with no input'
-    defs expected <<'EOS'
+absolute_dirname "$BASH_SOURCE"
+bin=$__/../bin
+
+describe dctk command
+  it "outputs a message with no input"
+    result=$("$bin"/dctk)
+    get <<'    EOS'
       Usage: dctk <command> [<args>]
 
       Some useful dctk commands are:
-         commands  List all dctk commands
+        commands  List all dctk commands
 
       See 'dctk help <command>' for information on a specific command.
-EOS
-    result=$("$bin"/dctk)
-    #shellcheck disable=SC2154
-    assert equal "$expected" "$result"
-    # shellcheck disable=SC2154
+    EOS
+    assert equal "$__" "$result"
   end
 
-  it 'outputs a message with input help'
-    defs expected <<'EOS'
+  it "outputs a message with input help"
+    result=$("$bin"/dctk help)
+    get <<'    EOS'
       Usage: dctk <command> [<args>]
 
       Some useful dctk commands are:
-         commands  List all dctk commands
+        commands  List all dctk commands
 
       See 'dctk help <command>' for information on a specific command.
-EOS
-    result=$("$bin"/dctk help)
-    assert equal "$expected" "$result"
+    EOS
+    assert equal "$__" "$result"
   end
 end

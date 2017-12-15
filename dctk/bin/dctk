@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 
 source kaizen.bash
-$(bring 'basename dirname' from kaizen.commands)
-export DCTK_PROG=$($basename "$BASH_SOURCE")
+export DCTK_PROG=$(basename -- "$BASH_SOURCE")
+
+absolute_dirname "$BASH_SOURCE"
+libexec=$__/../libexec
 
 main () {
-  $(grab help_flag from "$1"); shift
-  local command=$1           ; shift
-  local root
+  local command=${1:-}; shift ||:
 
-  root=$($dirname "$BASH_SOURCE")
-  (( help_flag )) && exec "$root"/libexec/help
+  case $command in
+    ''|help ) exec "$libexec"/help;;
+  esac
   find_command "$command"
   exec "$__" "$@"
 }
@@ -53,8 +54,4 @@ structured_search() {
 sourced? && return
 strict_mode on
 
-get <<'EOS'
-  ''   --help   ''   "ask for help"
-EOS
-$(parse_options "$__" "$@") || die "$usage"
-main "$__" "$@"             || die "$usage"
+main "$@" || die
