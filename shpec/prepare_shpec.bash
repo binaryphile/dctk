@@ -3,16 +3,15 @@ mkdir -p "$TMPDIR"
 
 set -o nounset
 
-source concorde.bash
+source kaizen.bash imports=absolute_dirname
 $(bring '
   cptree
-  dirname
   mktempd
-  readlink
   rmtree
-' from concorde.commands)
+' from kaizen.commands)
 
-root=$($dirname "$($readlink "$BASH_SOURCE")")/..
+absolute_dirname "$BASH_SOURCE"
+root=$__/..
 
 describe prepare
   it "outputs a message with no input"; ( _shpec_failures=0
