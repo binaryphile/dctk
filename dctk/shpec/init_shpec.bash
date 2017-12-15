@@ -4,13 +4,12 @@ mkdir -p -- "$TMPDIR"
 set -o nounset
 
 source kaizen.bash imports='
-  absolute_dirname
   absolute_path
   bring
   get
 '
 
-absolute_dirname "$BASH_SOURCE"
+__=$(dirname -- "$BASH_SOURCE")
 absolute_path "$__"/../..
 bin=$__/bin
 completions=$__/completions
