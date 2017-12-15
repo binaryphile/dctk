@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 
 source kaizen.bash
-$(bring basename from kaizen.commands)
-
-$(module dctk)
-
+$(bring 'basename dirname' from kaizen.commands)
 export DCTK_PROG=$($basename "$BASH_SOURCE")
 
 main () {
-  $(grabkw help_flag from "$1"); shift
-  local command=$1             ; shift
-  $(bring root)
+  $(grab help_flag from "$1"); shift
+  local command=$1           ; shift
+  local root
 
+  root=$($dirname "$BASH_SOURCE")
   (( help_flag )) && exec "$root"/libexec/help
   find_command "$command"
   exec "$__" "$@"
@@ -22,7 +20,7 @@ find_command() {
   local libexec=$1; shift
 
   search_roots "$command" "$libexec" && return
-  (( $# )) && structured_search "$command" "$@" || $(raise CommandNotFoundError errmsg="no such command '$command'")
+  (( $# )) && structured_search "$command" "$@" || $(raise CommandNotFoundError "no such command '$command'")
 }
 
 structured? () {

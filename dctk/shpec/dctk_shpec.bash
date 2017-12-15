@@ -3,7 +3,11 @@ mkdir -p -- "$TMPDIR"
 
 set -o nounset
 
-source kaizen.bash imports='absolute_dirname bring'
+source kaizen.bash imports='
+  bring
+  die
+  source_relative
+'
 $(bring '
   chmod
   mkdir
@@ -11,8 +15,7 @@ $(bring '
   rmtree
   touch
 ' from kaizen.commands)
-absolute_dirname "$BASH_SOURCE"
-source "$__"/../bin/dctk
+$(source_relative ../bin/dctk) || die
 
 describe find_command
   it "finds a command in libexec"; ( _shpec_failures=0
