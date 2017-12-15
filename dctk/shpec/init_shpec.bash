@@ -5,15 +5,16 @@ set -o nounset
 
 source kaizen.bash imports='
   absolute_dirname
+  absolute_path
   bring
   get
 '
 
 absolute_dirname "$BASH_SOURCE"
-root=$__/../..
-bin=$root/bin
-completions=$root/completions
-libexec=$root/dctk/libexec
+absolute_path "$__"/../..
+bin=$__/bin
+completions=$__/completions
+libexec=$__/dctk/libexec
 
 describe init
   it "outputs a message with no input"; ( _shpec_failures=0
