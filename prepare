@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-source concorde.bash
+source kaizen.bash
 
 get <<'EOS'
   usage: prepare name_of_your_dctk
 EOS
 printf -v usage '%s\n' "$__"
+
+$(bring echo from kaizen.commands)
 
 concorde::get_raw <<'EOS'
   Done! Enjoy your new trapper-keeper! If you're happy with your trapper-keeper,
@@ -26,26 +28,25 @@ concorde::get_raw <<'EOS'
 EOS
 printf -v message '%s\n' "$__"
 
-prepa_main() {
+main () {
   local name=${1,,}
   local bin
   local completions
   local root
 
   $(bring '
-    dirname
     ln
     mkdir
-    readlink
     rm
-  ' from concorde.commands)
-  root=$($dirname "$($readlink "$BASH_SOURCE")")
+  ' from kaizen.commands)
+  absolute_dirname "$BASH_SOURCE"
+  root=$__
   bin=$root/bin
   completions=$root/completions
 
-  put "Preparing your '$name' trapper-keeper!"
+  $echo "Preparing your '$name' trapper-keeper!"
 
-  find "$root" -maxdepth 1 -type f -print0 | xargs -0 rm
+  find "$root" -maxdepth 1 -type f -print0 | xargs -0 --no-run-if-empty $rm
   $rm "$bin"/dctk
   $ln ../dctk/bin/dctk "$bin/$name"
 
@@ -59,9 +60,9 @@ prepa_main() {
   printf "$message" "$name" "$name"
 }
 
-sourced && return
+sourced? && return
 strict_mode on
+$echo
 
-put
 (( ! $# )) && die "$usage"
-prepa_main "$@"
+main "$@"

@@ -3,7 +3,12 @@ mkdir -p "$TMPDIR"
 
 set -o nounset
 
-source kaizen.bash imports=absolute_dirname
+source kaizen.bash imports='
+  absolute_dirname
+  bring
+  get
+  globbing
+'
 $(bring '
   cptree
   mktempd
@@ -22,7 +27,9 @@ describe prepare
 
   it "outputs a message with an input name"; ( _shpec_failures=0
     dir=$($mktempd) || return
+    globbing on
     $cptree "$root"/* "$dir"
+    globbing off
     cd "$dir"
     get <<'    EOS'
       Preparing your 'name' trapper-keeper!
@@ -51,7 +58,9 @@ describe prepare
 
   it "removes top-level files"; ( _shpec_failures=0
     dir=$($mktempd) || return
+    globbing on
     $cptree "$root"/* "$dir"
+    globbing off
     cd "$dir"
     "$dir"/prepare name >/dev/null 2>&1
     result=$(find "$dir" -maxdepth 1 -type f -print)
@@ -62,7 +71,9 @@ describe prepare
 
   it "renames bin/dctk"; ( _shpec_failures=0
     dir=$($mktempd) || return
+    globbing on
     $cptree "$root"/* "$dir"
+    globbing off
     cd "$dir"
     result=$("$dir"/prepare name)
     [[ -h "$dir"/bin/name ]]
@@ -73,7 +84,9 @@ describe prepare
 
   it "renames completions/dctk"; ( _shpec_failures=0
     dir=$($mktempd) || return
+    globbing on
     $cptree "$root"/* "$dir"
+    globbing off
     cd "$dir"
     result=$("$dir"/prepare name)
     assert equal '(../dctk/completions/dctk.bash) (../dctk/completions/dctk.zsh)' "($(readlink "$dir"/completions/name.bash)) ($(readlink "$dir"/completions/name.zsh))"
@@ -83,7 +96,9 @@ describe prepare
 
   it "creates a name directory"; ( _shpec_failures=0
     dir=$($mktempd) || return
+    globbing on
     $cptree "$root"/* "$dir"
+    globbing off
     cd "$dir"
     result=$("$dir"/prepare name)
     [[ -d "$dir/name" ]]
