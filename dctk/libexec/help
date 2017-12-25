@@ -8,7 +8,7 @@ $(bring '
   readlink
 ' from kaizen.commands)
 
-prog=${_DCTK_PROG:-dctk}
+prog=${DCTK_PROG:-dctk}
 libexec=$($dirname "$($readlink "$BASH_SOURCE")")
 
 get <<'EOS'

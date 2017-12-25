@@ -5,7 +5,7 @@ source kaizen.bash imports='absolute_dirname get'
 absolute_dirname "$BASH_SOURCE"
 bin=$__/../bin
 
-describe dctk command
+describe "dctk command"
   it "outputs a message with no input"; ( _shpec_failures=0
     result=$("$bin"/dctk)
     get <<'    EOS'

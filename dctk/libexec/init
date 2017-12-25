@@ -6,7 +6,7 @@ $(bring '
   dirname
 ' from kaizen.commands)
 
-prog=${_DCTK_PROG:-dctk}
+prog=${DCTK_PROG:-dctk}
 __=$($dirname "$BASH_SOURCE")
 absolute_path "$__"/../..
 root=$__
@@ -49,7 +49,7 @@ main () {
     die "$__" rc=1
   }
 
-  printf 'export PATH+=:%q/bin\n' "$root"
+  printf 'PATH+=:%q/bin\n' "$root"
   case $shell in
     bash|zsh ) printf "$shell_format" "$completions" "$shell";;
   esac

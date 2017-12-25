@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
 source kaizen.bash
-export DCTK_PROG=$(basename -- "$BASH_SOURCE")
+export DCTK_PROG=$(basename -- "$0")
 
 absolute_dirname "$BASH_SOURCE"
-libexec=$__/../libexec
+project_root=$__/../..
+libexec=$project_root/dctk/libexec
+
+echo='printf -- %s\n'
 
 main () {
   local command=${1:-}; shift ||:
@@ -12,23 +15,22 @@ main () {
   case $command in
     ''|help ) exec "$libexec"/help;;
   esac
-  find_command "$command"
+  find_command "$command" "$@" || die "$__errmsg"
   exec "$__" "$@"
 }
 
 find_command() {
   local command=$1; shift
-  local libexec=$1; shift
 
   search_roots "$command" "$libexec" && return
-  (( $# )) && structured_search "$command" "$@" || $(raise CommandNotFoundError "no such command '$command'")
+  (( $# )) && structured_search "$command" "$project_root/$DCTK_PROG" || $(raise CommandNotFoundError "no such command '$command'")
 }
 
 structured? () {
   directory? "$1"/bin || directory? "$1"/libexec
 }
 
-search_roots() {
+search_roots () {
   local command=$1; shift
   local root
 
@@ -40,7 +42,7 @@ search_roots() {
   return 1
 }
 
-structured_search() {
+structured_search () {
   local command=$1
   local root=$2
 
