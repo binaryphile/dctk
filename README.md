@@ -1,5 +1,5 @@
 dctk: organize your programs with *[Dawson's Creek Trapper Keeper Ultra Keeper Futura S 2000]*
-==============================================================================================
+----------------------------------------------------------------------------------------------
 
 dctk helps you set up your own command or commands, which use separate
 scripts as subcommands. Such subcommands work much like git's or rbenv's
@@ -12,7 +12,7 @@ Think of it as a way to organize a large amount of functionality into a
 single command, like pages in a trapper-keeper, to keep the joke going.
 
 examples
-========
+--------
 
 Here are some quick examples in the model of rbenv, if rbenv were
 implemented as a trapper-keeper:
@@ -35,7 +35,7 @@ directories):
     └── …
 
 creating your first command
-===========================
+---------------------------
 
 Here's an example of adding a new subcommand. Let's say your
 trapper-keeper is named "rush". Run:
@@ -62,7 +62,7 @@ You can add autocompletion support and help documentation as well, by
 adding a little bit more to your script, as you'll see.
 
 dctk the project versus the command
-===================================
+-----------------------------------
 
 dctk, the project, is this repo and the code of which it is comprised.
 
@@ -77,7 +77,7 @@ customize it. Your project will contain dctk's bones but will add the
 functionality that makes it your own command.
 
 prerequisites
-=============
+-------------
 
 dctk requires the [kaizen] bash library.
 
@@ -85,7 +85,7 @@ Clone that repo and either add its `lib` to your PATH or put
 `lib/kzn.bash` somewhere already on your PATH.
 
 installation
-============
+------------
 
 First clone this repository to your own command's name:
 
@@ -109,7 +109,7 @@ Once `prepare`d, dctk becomes the new command is invoked like so:
     $ [command] [subcommand] [(args)]
 
 the dctk command
-================
+----------------
 
 After preparation, your command in `bin` is a link to the dctk script in
 `dctk/bin/dctk`. You can examine the file there to see the guts of dctk
@@ -124,7 +124,7 @@ means your command instead, once you've prepared the project, so just
 visualize that command's name wherever it says `dctk`.
 
 what's in your trapper-keeper
-=============================
+-----------------------------
 
 Your trapper-keeper comes with a few subcommands already built-in:
 
@@ -140,7 +140,7 @@ Your trapper-keeper comes with a few subcommands already built-in:
     from a shell startup file (e.g. `.bash_profile`)
 
 subcommands
-===========
+-----------
 
 Subcommands live in the directory named for your command and are simply
 named for the subcommand, e.g. `rbenv/versions`. For this reason you
@@ -158,7 +158,7 @@ well-known flag (`--complete`). dctk handles the details of informing
 the shell (bash and zsh supported).
 
 self-documenting subcommands
-============================
+----------------------------
 
 Documentation is provided by adding leading comments to your script.
 This feature is limited to scripts which use "\#" as their comment
@@ -204,7 +204,7 @@ Because it is free-form, the Help section must be the last of your
 leading comments in the script.
 
 autocompletion
-==============
+--------------
 
 dctk provides autocompletion at two levels:
 
@@ -239,7 +239,7 @@ receiving the `--complete` flag instead of normal operation. dctk feeds
 this output to your shell's autocompletion handler for you.
 
 multiple commands
-=================
+-----------------
 
 When you saw the directory tree earlier, it was for a single command.
 However you can have multiple commands as well, independent of each
@@ -271,7 +271,7 @@ You should also enable completions for your command with a link:
 Add subcommands to the \[command\] directory and you're good to go.
 
 structured commands
-===================
+-------------------
 
 So far, you've seen simple commands. Subcommands exist simply as
 executables in their command's directory.
@@ -304,7 +304,7 @@ example, if your command is named "rush", then the variable is
 the share folder `$_RUSH_ROOT/share`.
 
 why "trapper-keeper"?
-=====================
+---------------------
 
 dctk is meant to make it easy to assimilate any kind of technology into
 your trapper-keeper as a subcommand, much like *Dawson's Creek Trapper
@@ -314,7 +314,7 @@ became sentient and took over the world. Hopefully yours will be less
 ambitious, while still as powerful.
 
 isn't dctk just a rip-off of [sub]?
-===================================
+-----------------------------------
 
 dctk is inspired by sub but shares almost no code, being a ground-up
 rewrite. It also sports numerous additional features:
